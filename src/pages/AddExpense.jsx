@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Save } from 'lucide-react';
 import { transactionService } from '../services/transactionService';
 import Button from '../components/Button';
@@ -10,6 +10,7 @@ const PREDEFINED_CATEGORIES = ['MANGIME', 'VETERINARIO', 'MANUTENZIONE', 'PULIZI
 
 const AddExpense = () => {
     const navigate = useNavigate();
+    const { id } = useParams();
     const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState({
         amount: '',
@@ -17,6 +18,37 @@ const AddExpense = () => {
         categorySelect: 'MANGIME',
         customCategory: ''
     });
+
+    const isEditMode = !!id;
+
+    useEffect(() => {
+        if (isEditMode) {
+            loadTransaction();
+        }
+    }, [id]);
+
+    const loadTransaction = async () => {
+        setLoading(true);
+        try {
+            const data = await transactionService.getTransactionById(id);
+            if (data) {
+                // Determine if category is predefined or custom
+                const isPredefined = PREDEFINED_CATEGORIES.includes(data.category);
+
+                setFormData({
+                    amount: data.amount,
+                    date: data.date,
+                    categorySelect: isPredefined ? data.category : 'ALTRO',
+                    customCategory: isPredefined ? '' : data.category
+                });
+            }
+        } catch (error) {
+            alert('Errore nel caricamento dati: ' + error.message);
+            navigate('/');
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -33,12 +65,18 @@ const AddExpense = () => {
 
         setLoading(true);
         try {
-            await transactionService.addTransaction({
+            const transactionData = {
                 type: 'expense',
                 amount: parseFloat(formData.amount),
                 date: formData.date,
                 category: category.toUpperCase()
-            });
+            };
+
+            if (isEditMode) {
+                await transactionService.updateTransaction(id, transactionData);
+            } else {
+                await transactionService.addTransaction(transactionData);
+            }
             navigate('/');
         } catch (error) {
             alert('Errore durante il salvataggio: ' + error.message);
@@ -57,7 +95,7 @@ const AddExpense = () => {
                 >
                     Indietro
                 </Button>
-                <h2>Nuova Spesa</h2>
+                <h2>{isEditMode ? 'Modifica Spesa' : 'Nuova Spesa'}</h2>
             </div>
 
             <form onSubmit={handleSubmit} className="entry-form">
@@ -70,7 +108,7 @@ const AddExpense = () => {
                     onChange={handleChange}
                     placeholder="0.00"
                     required
-                    autoFocus
+                    autoFocus={!isEditMode}
                 />
 
                 <Input
@@ -118,7 +156,7 @@ const AddExpense = () => {
                     icon={<Save size={20} />}
                     className="submit-btn"
                 >
-                    INVIA
+                    {isEditMode ? 'AGGIORNA' : 'INVIA'}
                 </Button>
             </form>
         </div>

@@ -1,9 +1,11 @@
 import React, { useMemo } from 'react';
-import { TrendingUp, TrendingDown, Egg, Trash2 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { TrendingUp, TrendingDown, Egg, Trash2, Pencil } from 'lucide-react';
 import './TransactionList.css';
 import Button from './Button';
 
 const TransactionList = ({ transactions, onDelete, isLoading }) => {
+    const navigate = useNavigate();
     // Group transactions by date
     const groupedTransactions = useMemo(() => {
         const groups = {};
@@ -63,6 +65,15 @@ const TransactionList = ({ transactions, onDelete, isLoading }) => {
                                     <span className={`t-amount ${t.type}`}>
                                         {t.type === 'income' ? '+' : '-'} {Number(t.amount).toFixed(2)} €
                                     </span>
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        className="btn-icon-only"
+                                        onClick={() => navigate(t.type === 'income' ? `/edit-income/${t.id}` : `/edit-expense/${t.id}`)}
+                                        aria-label="Modifica transazione"
+                                    >
+                                        <Pencil size={16} />
+                                    </Button>
                                     <Button
                                         variant="ghost"
                                         size="sm"

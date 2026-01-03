@@ -52,6 +52,44 @@ export const transactionService = {
     },
 
     /**
+     * Get a single transaction by ID
+     * @param {string} id 
+     */
+    async getTransactionById(id) {
+        const { data, error } = await supabase
+            .from('transactions')
+            .select('*')
+            .eq('id', id)
+            .single();
+
+        if (error) {
+            console.error('Error fetching transaction:', error);
+            throw error;
+        }
+        return data;
+    },
+
+    /**
+     * Update an existing transaction
+     * @param {string} id 
+     * @param {Object} updates 
+     */
+    async updateTransaction(id, updates) {
+        const { data, error } = await supabase
+            .from('transactions')
+            .update(updates)
+            .eq('id', id)
+            .select()
+            .single();
+
+        if (error) {
+            console.error('Error updating transaction:', error);
+            throw error;
+        }
+        return data;
+    },
+
+    /**
      * Get statistics (this logic might stay in frontend for simplicity or use DB aggregation)
      * For now we fetch all and aggregate in frontend for < 1000 items is fine.
      */

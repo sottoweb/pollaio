@@ -1,0 +1,103 @@
+.stats-header {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-xl);
+}
+
+.filters-section {
+    background-color: var(--color-bg-secondary);
+    padding: var(--spacing-lg);
+    border-radius: var(--radius-lg);
+    margin-bottom: var(--spacing-xl);
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-xl);
+    align-items: flex-end;
+    border: 1px solid var(--border-color);
+}
+
+.date-inputs {
+    display: flex;
+    gap: var(--spacing-md);
+}
+
+.date-inputs .input-group {
+    margin-bottom: 0;
+}
+
+.period-summary {
+    display: flex;
+    gap: var(--spacing-md);
+}
+
+.summary-pill {
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius-full);
+    font-weight: 600;
+    font-size: var(--font-size-sm);
+    background-color: var(--color-bg-primary);
+    border: 1px solid var(--border-color);
+}
+
+.summary-pill.income {
+    color: var(--color-success);
+    border-color: rgba(16, 185, 129, 0.3);
+}
+
+.summary-pill.expense {
+    color: var(--color-danger);
+    border-color: rgba(239, 68, 68, 0.3);
+}
+
+.summary-pill.balance {
+    color: var(--color-accent);
+    border-color: rgba(251, 191, 36, 0.3);
+}
+
+.charts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: var(--spacing-lg);
+}
+
+.chart-card {
+    background-color: var(--color-bg-secondary);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
+    border: 1px solid var(--border-color);
+}
+
+.chart-card.wide {
+    grid-column: 1 / -1;
+}
+
+.chart-card h3 {
+    margin-bottom: var(--spacing-lg);
+    font-size: var(--font-size-lg);
+    color: var(--color-text-secondary);
+}
+
+.chart-container {
+    width: 100%;
+    min-height: 300px;
+}
+
+.no-data {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: var(--color-text-secondary);
+}
+
+@media (max-width: 768px) {
+    .date-inputs {
+        width: 100%;
+        flex-direction: column;
+    }
+
+    .charts-grid {
+        grid-template-columns: 1fr;
+    }
+}

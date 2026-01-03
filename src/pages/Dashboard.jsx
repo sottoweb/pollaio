@@ -89,7 +89,17 @@ const Dashboard = () => {
     return (
         <div className="dashboard">
             <div className="dashboard-header">
-                <h2>Panoramica</h2>
+                <div>
+                    <h2>Panoramica</h2>
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        className="link-stats"
+                        onClick={() => navigate('/stats')}
+                    >
+                        Vedi Grafici Avanzati →
+                    </Button>
+                </div>
                 <div className="filter-controls">
                     <select
                         value={timeFilter}

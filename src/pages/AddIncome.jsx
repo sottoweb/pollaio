@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Save } from 'lucide-react';
 import { transactionService } from '../services/transactionService';
 import Button from '../components/Button';
@@ -8,13 +8,42 @@ import './Forms.css';
 
 const AddIncome = () => {
     const navigate = useNavigate();
+    const { id } = useParams(); // Get ID from URL if in edit mode
     const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState({
         amount: '',
-        date: new Date().toISOString().split('T')[0], // YYYY-MM-DD
+        date: new Date().toISOString().split('T')[0],
         eggs_count: '',
         category: 'VENDITA UOVA'
     });
+
+    const isEditMode = !!id;
+
+    useEffect(() => {
+        if (isEditMode) {
+            loadTransaction();
+        }
+    }, [id]);
+
+    const loadTransaction = async () => {
+        setLoading(true);
+        try {
+            const data = await transactionService.getTransactionById(id);
+            if (data) {
+                setFormData({
+                    amount: data.amount,
+                    date: data.date,
+                    eggs_count: data.eggs_count || '',
+                    category: data.category
+                });
+            }
+        } catch (error) {
+            alert('Errore nel caricamento dati: ' + error.message);
+            navigate('/');
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -27,13 +56,19 @@ const AddIncome = () => {
 
         setLoading(true);
         try {
-            await transactionService.addTransaction({
+            const transactionData = {
                 type: 'income',
                 amount: parseFloat(formData.amount),
                 date: formData.date,
                 category: formData.category,
                 eggs_count: formData.eggs_count ? parseInt(formData.eggs_count) : null,
-            });
+            };
+
+            if (isEditMode) {
+                await transactionService.updateTransaction(id, transactionData);
+            } else {
+                await transactionService.addTransaction(transactionData);
+            }
             navigate('/');
         } catch (error) {
             alert('Errore durante il salvataggio: ' + error.message);
@@ -52,7 +87,7 @@ const AddIncome = () => {
                 >
                     Indietro
                 </Button>
-                <h2>Nuova Entrata</h2>
+                <h2>{isEditMode ? 'Modifica Entrata' : 'Nuova Entrata'}</h2>
             </div>
 
             <form onSubmit={handleSubmit} className="entry-form">
@@ -65,7 +100,7 @@ const AddIncome = () => {
                     onChange={handleChange}
                     placeholder="0.00"
                     required
-                    autoFocus
+                    autoFocus={!isEditMode}
                 />
 
                 <Input
@@ -94,7 +129,7 @@ const AddIncome = () => {
                     icon={<Save size={20} />}
                     className="submit-btn"
                 >
-                    INVIA
+                    {isEditMode ? 'AGGIORNA' : 'INVIA'}
                 </Button>
             </form>
         </div>
