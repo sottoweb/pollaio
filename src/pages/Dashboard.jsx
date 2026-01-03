@@ -137,7 +137,7 @@ const Dashboard = () => {
 
             <div className="action-buttons">
                 <Button
-                    variant="primary"
+                    variant="success"
                     size="lg"
                     className="action-btn"
                     onClick={() => navigate('/add-income')}

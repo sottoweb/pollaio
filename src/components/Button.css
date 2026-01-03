@@ -38,6 +38,16 @@
     background-color: var(--border-color);
 }
 
+.btn-success {
+    background-color: var(--color-success);
+    color: white;
+}
+
+.btn-success:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
 .btn-danger {
     background-color: var(--color-danger);
     color: white;
