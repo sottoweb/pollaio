@@ -1,0 +1,57 @@
+:root {
+  /* Premium Dark Theme Palette */
+  --color-bg-primary: #0f172a; /* Slate 900 */
+  --color-bg-secondary: #1e293b; /* Slate 800 */
+  --color-bg-card: #1e293b;
+  
+  --color-text-primary: #f8fafc; /* Slate 50 */
+  --color-text-secondary: #94a3b8; /* Slate 400 */
+  
+  --color-accent: #fbbf24; /* Amber 400 - Gold-ish */
+  --color-accent-hover: #f59e0b;
+  
+  --color-success: #10b981; /* Emerald 500 */
+  --color-danger: #ef4444; /* Red 500 */
+  --color-info: #3b82f6; /* Blue 500 */
+  
+  /* Typography */
+  --font-family-base: 'Outfit', system-ui, sans-serif;
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.25rem;
+  --font-size-2xl: 1.5rem;
+  --font-size-3xl: 1.875rem;
+  
+  /* Spacing */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  
+  /* Borders & Radius */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+  --radius-full: 9999px;
+  
+  --border-color: #334155; /* Slate 700 */
+  
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  --shadow-glow: 0 0 15px rgba(251, 191, 36, 0.3);
+}
+
+@media (prefers-color-scheme: light) {
+  /* Light Theme Override (Optional, stick to Dark for Premium feel per request? 
+     User didn't specify, but "Premium" often implies dark or very clean light.
+     Let's allow Light mode but default to Dark since it's farming/tablet usage friendly? 
+     Actually user asked for "Sito web molto semplice". 
+     Let's keep just one theme for simplicity as requested "molto semplice".
+     I will stick to the Dark Theme defined above as default. */
+}

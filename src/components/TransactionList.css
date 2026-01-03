@@ -1,0 +1,130 @@
+.transaction-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+}
+
+.date-header {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: var(--spacing-sm);
+    padding-left: var(--spacing-sm);
+    font-weight: 600;
+}
+
+.transaction-items {
+    background-color: var(--color-bg-secondary);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+}
+
+.transaction-item {
+    display: flex;
+    align-items: center;
+    padding: var(--spacing-md);
+    border-bottom: 1px solid var(--border-color);
+    gap: var(--spacing-md);
+    transition: background-color 0.2s;
+}
+
+.transaction-item:last-child {
+    border-bottom: none;
+}
+
+.transaction-item:hover {
+    background-color: rgba(255, 255, 255, 0.02);
+}
+
+.t-icon-wrapper {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--color-bg-primary);
+    flex-shrink: 0;
+}
+
+.icon-income {
+    color: var(--color-success);
+}
+
+.icon-expense {
+    color: var(--color-danger);
+}
+
+.t-details {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.t-category {
+    font-weight: 600;
+    color: var(--color-text-primary);
+}
+
+.t-meta {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+}
+
+.t-amount-wrapper {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.t-amount {
+    font-weight: 700;
+    font-family: monospace;
+    /* For better number alignment */
+    font-size: var(--font-size-lg);
+}
+
+.t-amount.income {
+    color: var(--color-success);
+}
+
+.t-amount.expense {
+    color: var(--color-text-primary);
+    /* Keeping expenses neutral or red? Red is clearer */
+    color: var(--color-danger);
+}
+
+.btn-delete {
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.transaction-item:hover .btn-delete {
+    opacity: 1;
+}
+
+/* Empty State */
+.loading-state,
+.empty-state {
+    text-align: center;
+    padding: var(--spacing-xl);
+    color: var(--color-text-secondary);
+}
+
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-md);
+}
+
+.empty-icon {
+    color: var(--color-border);
+    opacity: 0.5;
+}
+
+.sub-text {
+    font-size: var(--font-size-sm);
+}
