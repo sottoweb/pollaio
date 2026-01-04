@@ -3,9 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, RefreshCw } from 'lucide-react';
 import {
     LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-    PieChart, Pie, Cell, Legend
+    PieChart, Pie, Cell, Legend, BarChart, Bar
 } from 'recharts';
 import { transactionService } from '../services/transactionService';
+import { statsService } from '../services/statsService';
 import Button from '../components/Button';
 import Input from '../components/Input';
 import './AdvancedStats.css';
@@ -15,6 +16,7 @@ const COLORS = ['#10b981', '#ef4444', '#fbbf24', '#3b82f6', '#8b5cf6', '#ec4899'
 const AdvancedStats = () => {
     const navigate = useNavigate();
     const [transactions, setTransactions] = useState([]);
+    const [inventoryStats, setInventoryStats] = useState({ byCoop: [], topProducts: [] });
     const [loading, setLoading] = useState(true);
     const [dateRange, setDateRange] = useState({
         start: new Date(new Date().getFullYear(), 0, 1).toISOString().split('T')[0], // Jan 1st
@@ -28,8 +30,16 @@ const AdvancedStats = () => {
     const loadData = async () => {
         setLoading(true);
         try {
-            const data = await transactionService.getTransactions();
-            setTransactions(data || []);
+            const [trxData, coopStats, prodStats] = await Promise.all([
+                transactionService.getTransactions(),
+                statsService.getExpensesByCoop(),
+                statsService.getTopProducts()
+            ]);
+            setTransactions(trxData || []);
+            setInventoryStats({
+                byCoop: coopStats || [],
+                topProducts: prodStats || []
+            });
         } catch (error) {
             console.error(error);
         } finally {
@@ -164,6 +174,60 @@ const AdvancedStats = () => {
                         )}
                     </div>
                 </div>
+
+                {/* INVENTORY STATS START */}
+                <div className="chart-card">
+                    <h3>Spese per Pollaio</h3>
+                    <div className="chart-container">
+                        {inventoryStats.byCoop.length > 0 ? (
+                            <ResponsiveContainer width="100%" height={300}>
+                                <PieChart>
+                                    <Pie
+                                        data={inventoryStats.byCoop}
+                                        cx="50%"
+                                        cy="50%"
+                                        outerRadius={80}
+                                        dataKey="value"
+                                        label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                                    >
+                                        {inventoryStats.byCoop.map((entry, index) => (
+                                            <Cell key={`cell-coop-${index}`} fill={COLORS[index % COLORS.length]} />
+                                        ))}
+                                    </Pie>
+                                    <Tooltip
+                                        formatter={(value) => `${Number(value).toFixed(2)} €`}
+                                        contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #334155' }}
+                                    />
+                                </PieChart>
+                            </ResponsiveContainer>
+                        ) : (<div className="no-data">Nessun dato pollaio</div>)}
+                    </div>
+                </div>
+
+                <div className="chart-card wide">
+                    <h3>Prodotti più Acquistati</h3>
+                    <div className="chart-container">
+                        {inventoryStats.topProducts.length > 0 ? (
+                            <ResponsiveContainer width="100%" height={300}>
+                                <BarChart data={inventoryStats.topProducts} layout="vertical">
+                                    <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
+                                    <XAxis type="number" stroke="#94a3b8" />
+                                    <YAxis dataKey="name" type="category" stroke="#94a3b8" width={100} />
+                                    <Tooltip
+                                        cursor={{ fill: '#334155', opacity: 0.4 }}
+                                        contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #334155' }}
+                                        formatter={(value, name) => [
+                                            name === 'value' ? `${Number(value).toFixed(2)} €` : value,
+                                            name === 'value' ? 'Spesa Totale' : 'Quantità'
+                                        ]}
+                                    />
+                                    <Bar dataKey="value" name="Spesa Totale" fill="#8b5cf6" radius={[0, 4, 4, 0]} />
+                                </BarChart>
+                            </ResponsiveContainer>
+                        ) : (<div className="no-data">Nessun prodotto acquistato</div>)}
+                    </div>
+                </div>
+                {/* INVENTORY STATS END */}
             </div>
         </div>
     );

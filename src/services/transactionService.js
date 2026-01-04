@@ -7,8 +7,9 @@ export const transactionService = {
     async getTransactions() {
         const { data, error } = await supabase
             .from('transactions')
-            .select('*, profiles:created_by(first_name, last_name)')
-            .order('date', { ascending: false });
+            .select('*, profiles:created_by(first_name, last_name), customers(name), suppliers(name)')
+            .order('date', { ascending: false })
+            .order('created_at', { ascending: false });
 
         if (error) {
             console.error('Error fetching transactions:', error);
@@ -62,7 +63,19 @@ export const transactionService = {
     async getTransactionById(id) {
         const { data, error } = await supabase
             .from('transactions')
-            .select('*, profiles:created_by(first_name, last_name)')
+            .select(`
+                *,
+                profiles:created_by(first_name, last_name),
+                transaction_items (
+                    id,
+                    product_id,
+                    quantity,
+                    unit_price,
+                    subtotal,
+                    products ( id, name, unit )
+                ),
+                coops ( name )
+            `)
             .eq('id', id)
             .single();
 
