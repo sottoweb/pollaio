@@ -71,3 +71,38 @@
     color: var(--color-accent);
     background-color: rgba(251, 191, 36, 0.1);
 }
+
+/* Clickable State */
+.stats-card.clickable {
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+.stats-card.clickable:active {
+    transform: scale(0.98);
+}
+
+/* Add indicator (+) inside the icon */
+.stats-icon-wrapper {
+    position: relative;
+}
+
+.add-indicator {
+    position: absolute;
+    bottom: -6px;
+    right: -6px;
+    background-color: var(--color-bg-primary);
+    color: inherit;
+    /* Uses the parent color (green/red) */
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 16px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border: 2px solid currentColor;
+}

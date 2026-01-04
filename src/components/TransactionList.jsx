@@ -31,9 +31,9 @@ const TransactionList = ({ transactions, onDelete }) => {
 
     const handleEdit = (transaction) => {
         if (transaction.type === 'income') {
-            navigate(`/add-income/${transaction.id}`);
+            navigate(`/edit-income/${transaction.id}`);
         } else {
-            navigate(`/add-expense/${transaction.id}`);
+            navigate(`/edit-expense/${transaction.id}`);
         }
     };
 

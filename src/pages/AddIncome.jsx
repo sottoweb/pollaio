@@ -7,6 +7,8 @@ import Button from '../components/Button';
 import Input from '../components/Input';
 import './Forms.css';
 
+import CRMSelector from '../components/CRMSelector';
+
 const AddIncome = () => {
     const navigate = useNavigate();
     const { user } = useAuth();
@@ -16,7 +18,8 @@ const AddIncome = () => {
         amount: '',
         date: new Date().toISOString().split('T')[0],
         eggs_count: '',
-        category: 'VENDITA UOVA'
+        category: 'VENDITA UOVA',
+        customer_id: null
     });
 
     const isEditMode = !!id;
@@ -36,7 +39,8 @@ const AddIncome = () => {
                     amount: data.amount,
                     date: data.date,
                     eggs_count: data.eggs_count || '',
-                    category: data.category
+                    category: data.category,
+                    customer_id: data.customer_id
                 });
             }
         } catch (error) {
@@ -64,6 +68,7 @@ const AddIncome = () => {
                 date: formData.date,
                 category: formData.category,
                 eggs_count: formData.eggs_count ? parseInt(formData.eggs_count) : null,
+                customer_id: formData.customer_id
             };
 
             if (isEditMode) {
@@ -121,6 +126,12 @@ const AddIncome = () => {
                     value={formData.eggs_count}
                     onChange={handleChange}
                     placeholder="0"
+                />
+
+                <CRMSelector
+                    type="customer"
+                    selectedId={formData.customer_id}
+                    onSelect={(id) => setFormData(prev => ({ ...prev, customer_id: id }))}
                 />
 
                 <Button

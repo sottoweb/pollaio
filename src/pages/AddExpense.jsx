@@ -7,6 +7,8 @@ import Button from '../components/Button';
 import Input from '../components/Input';
 import './Forms.css';
 
+import CRMSelector from '../components/CRMSelector';
+
 const PREDEFINED_CATEGORIES = ['MANGIME', 'VETERINARIO', 'MANUTENZIONE', 'PULIZIA', 'ALTRO'];
 
 const AddExpense = () => {
@@ -18,7 +20,8 @@ const AddExpense = () => {
         amount: '',
         date: new Date().toISOString().split('T')[0],
         categorySelect: 'MANGIME',
-        customCategory: ''
+        customCategory: '',
+        supplier_id: null
     });
 
     const isEditMode = !!id;
@@ -41,7 +44,8 @@ const AddExpense = () => {
                     amount: data.amount,
                     date: data.date,
                     categorySelect: isPredefined ? data.category : 'ALTRO',
-                    customCategory: isPredefined ? '' : data.category
+                    customCategory: isPredefined ? '' : data.category,
+                    supplier_id: data.supplier_id
                 });
             }
         } catch (error) {
@@ -72,6 +76,7 @@ const AddExpense = () => {
                 amount: parseFloat(formData.amount),
                 date: formData.date,
                 category: category.toUpperCase(),
+                supplier_id: formData.supplier_id
             };
 
             if (isEditMode) {
@@ -149,6 +154,12 @@ const AddExpense = () => {
                         className="slide-down"
                     />
                 )}
+
+                <CRMSelector
+                    type="supplier"
+                    selectedId={formData.supplier_id}
+                    onSelect={(id) => setFormData(prev => ({ ...prev, supplier_id: id }))}
+                />
 
                 <Button
                     type="submit"

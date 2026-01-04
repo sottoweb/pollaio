@@ -1,9 +1,14 @@
 import React from 'react';
 import './StatsCard.css';
 
-const StatsCard = ({ title, value, type = 'neutral', icon: Icon }) => {
+const StatsCard = ({ title, value, type = 'neutral', icon: Icon, onClick }) => {
     return (
-        <div className={`stats-card stats-${type}`}>
+        <div
+            className={`stats-card stats-${type} ${onClick ? 'clickable' : ''}`}
+            onClick={onClick}
+            role={onClick ? "button" : undefined}
+            tabIndex={onClick ? 0 : undefined}
+        >
             <div className="stats-content">
                 <span className="stats-title">{title}</span>
                 <span className="stats-value">
@@ -14,6 +19,7 @@ const StatsCard = ({ title, value, type = 'neutral', icon: Icon }) => {
             {Icon && (
                 <div className="stats-icon-wrapper">
                     <Icon size={24} className="stats-icon" />
+                    {onClick && <div className="add-indicator">+</div>}
                 </div>
             )}
         </div>

@@ -123,12 +123,14 @@ const Dashboard = () => {
                     value={stats.income}
                     type="income"
                     icon={() => <span className="emoji-icon">💰</span>}
+                    onClick={() => navigate('/add-income')}
                 />
                 <StatsCard
                     title="Uscite"
                     value={stats.expense}
                     type="expense"
                     icon={() => <span className="emoji-icon">💸</span>}
+                    onClick={() => navigate('/add-expense')}
                 />
                 <StatsCard
                     title="Bilancio"
@@ -142,27 +144,6 @@ const Dashboard = () => {
                     type="eggs"
                     icon={() => <span className="emoji-icon">🥚</span>}
                 />
-            </div>
-
-            <div className="action-buttons">
-                <Button
-                    variant="success"
-                    size="lg"
-                    className="action-btn"
-                    onClick={() => navigate('/add-income')}
-                    icon={<Plus size={24} />}
-                >
-                    Aggiungi Entrata
-                </Button>
-                <Button
-                    variant="danger"
-                    size="lg"
-                    className="action-btn"
-                    onClick={() => navigate('/add-expense')}
-                    icon={<Minus size={24} />}
-                >
-                    Aggiungi Spesa
-                </Button>
             </div>
 
             <div className="list-section">
