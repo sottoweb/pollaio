@@ -76,6 +76,17 @@ export const coopService = {
         return data;
     },
 
+    async updateBreed(id, updates) {
+        const { data, error } = await supabase
+            .from('coop_breeds')
+            .update(updates)
+            .eq('id', id)
+            .select()
+            .single();
+        if (error) throw error;
+        return data;
+    },
+
     // --- HENS (GALLINE SINGOLE) ---
 
     async getHensByBreed(breedId) {

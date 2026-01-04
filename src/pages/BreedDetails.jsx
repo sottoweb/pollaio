@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Plus, Trash2, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, Plus, Trash2 } from 'lucide-react';
 import { coopService } from '../services/coopService';
 import Button from '../components/Button';
 import Input from '../components/Input';
@@ -15,7 +15,13 @@ const BreedDetails = () => {
 
     // Add Hen Form
     const [showForm, setShowForm] = useState(false);
-    const [newHen, setNewHen] = useState({ name: '', notes: '' });
+    const [newHen, setNewHen] = useState({
+        name: '',
+        notes: '',
+        birth_date: '',
+        provenance: '',
+        sex: 'F'
+    });
 
     useEffect(() => {
         loadData();
@@ -62,13 +68,15 @@ const BreedDetails = () => {
                 coop_breed_id: id,
                 name_id: newHen.name,
                 notes: newHen.notes,
-                birth_date: new Date().toISOString()
+                birth_date: newHen.birth_date || null,
+                provenance: newHen.provenance,
+                sex: newHen.sex
             });
-            setNewHen({ name: '', notes: '' });
+            setNewHen({ name: '', notes: '', birth_date: '', provenance: '', sex: 'F' });
             setShowForm(false);
             loadData();
         } catch (error) {
-            alert("Errore aggiunta gallina");
+            alert("Errore aggiunta gallina: " + error.message);
         }
     };
 
@@ -145,22 +153,56 @@ const BreedDetails = () => {
                             placeholder="Es. 001 o Rosina"
                             required
                         />
+
+                        <div className="form-row">
+                            <div className="input-group">
+                                <label className="input-label">Sesso</label>
+                                <select
+                                    className="input-field select-field"
+                                    value={newHen.sex}
+                                    onChange={(e) => setNewHen(prev => ({ ...prev, sex: e.target.value }))}
+                                >
+                                    <option value="F">Gallina</option>
+                                    <option value="M">Gallo</option>
+                                </select>
+                            </div>
+                            <Input
+                                label="Data Nascita"
+                                type="date"
+                                value={newHen.birth_date}
+                                onChange={(e) => setNewHen(prev => ({ ...prev, birth_date: e.target.value }))}
+                            />
+                        </div>
+
+                        <Input
+                            label="Provenienza"
+                            value={newHen.provenance}
+                            onChange={(e) => setNewHen(prev => ({ ...prev, provenance: e.target.value }))}
+                            placeholder="Es. Consorzio Agrario"
+                        />
+
                         <Input
                             label="Note (Opzionale)"
                             value={newHen.notes}
                             onChange={(e) => setNewHen(prev => ({ ...prev, notes: e.target.value }))}
-                            placeholder="Es. Nata in incubatrice"
+                            placeholder="Es. Anello Rosso"
                         />
-                        <Button type="submit" variant="primary">Salva</Button>
+                        <Button type="submit" variant="primary">Salva Scheda</Button>
                     </form>
                 )}
 
                 <div className="hens-list">
                     {hens.map(hen => (
                         <div key={hen.id} className="hen-item">
-                            <div className="hen-icon">🥚</div>
+                            <div className="hen-icon">
+                                {hen.sex === 'M' ? '🐓' : '🐔'}
+                            </div>
                             <div className="hen-info">
                                 <strong>{hen.name_id}</strong>
+                                <div className="hen-details">
+                                    {hen.birth_date && <span>Nata: {new Date(hen.birth_date).toLocaleDateString()}</span>}
+                                    {hen.provenance && <span> • Prov: {hen.provenance}</span>}
+                                </div>
                                 {hen.notes && <span className="hen-notes">{hen.notes}</span>}
                             </div>
                             <button className="btn-icon-only" onClick={() => handleDeleteHen(hen.id)}>

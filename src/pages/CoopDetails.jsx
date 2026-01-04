@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Save, Plus, Camera, Trash2 } from 'lucide-react';
+import { ArrowLeft, Save, Plus, Camera, Trash2, Pencil } from 'lucide-react';
 import { coopService } from '../services/coopService';
 import Button from '../components/Button';
 import Input from '../components/Input';
@@ -15,7 +15,8 @@ const CoopDetails = () => {
 
     // Form State
     const [showForm, setShowForm] = useState(false);
-    const [newBreed, setNewBreed] = useState({ name: '', count: '', image: null });
+    const [editingBreedId, setEditingBreedId] = useState(null); // ID if editing
+    const [formData, setFormData] = useState({ name: '', count: '', image: null });
     const [previewUrl, setPreviewUrl] = useState(null);
     const [submitting, setSubmitting] = useState(false);
 
@@ -39,36 +40,64 @@ const CoopDetails = () => {
         }
     };
 
+    const resetForm = () => {
+        setFormData({ name: '', count: '', image: null });
+        setPreviewUrl(null);
+        setEditingBreedId(null);
+        setShowForm(false);
+    }
+
+    const handleEditClick = (e, breed) => {
+        e.stopPropagation(); // Prevent navigation
+        setEditingBreedId(breed.id);
+        setFormData({
+            name: breed.breed_name,
+            count: breed.total_count,
+            image: null
+        });
+        setPreviewUrl(breed.image_url);
+        setShowForm(true);
+    }
+
     const handleImageChange = (e) => {
         const file = e.target.files[0];
         if (file) {
-            setNewBreed(prev => ({ ...prev, image: file }));
+            setFormData(prev => ({ ...prev, image: file }));
             setPreviewUrl(URL.createObjectURL(file));
         }
     };
 
-    const handleAddBreed = async (e) => {
+    const handleAddOrUpdateBreed = async (e) => {
         e.preventDefault();
-        if (!newBreed.name) return;
+        if (!formData.name) return;
 
         setSubmitting(true);
         try {
-            let imageUrl = null;
-            if (newBreed.image) {
-                imageUrl = await coopService.uploadBreedImage(newBreed.image);
+            let imageUrl = previewUrl; // Keep old URL if no new image
+
+            // If new image selected, upload it
+            if (formData.image) {
+                imageUrl = await coopService.uploadBreedImage(formData.image);
             }
 
-            await coopService.addBreed({
-                coop_id: id,
-                breed_name: newBreed.name,
-                total_count: parseInt(newBreed.count) || 0,
-                image_url: imageUrl
-            });
+            if (editingBreedId) {
+                // UPDATE MODE
+                await coopService.updateBreed(editingBreedId, {
+                    breed_name: formData.name,
+                    total_count: parseInt(formData.count) || 0,
+                    image_url: imageUrl
+                });
+            } else {
+                // CREATE MODE
+                await coopService.addBreed({
+                    coop_id: id,
+                    breed_name: formData.name,
+                    total_count: parseInt(formData.count) || 0,
+                    image_url: imageUrl
+                });
+            }
 
-            // Reset form
-            setNewBreed({ name: '', count: '', image: null });
-            setPreviewUrl(null);
-            setShowForm(false);
+            resetForm();
             loadData();
         } catch (error) {
             alert('Errore salvataggio razza: ' + error.message);
@@ -91,13 +120,14 @@ const CoopDetails = () => {
             <div className="breeds-section">
                 <div className="section-header">
                     <h3>Razze allevate</h3>
-                    <Button onClick={() => setShowForm(!showForm)} size="sm" icon={<Plus size={16} />}>
+                    <Button onClick={() => { resetForm(); setShowForm(!showForm); }} size="sm" icon={<Plus size={16} />}>
                         Aggiungi Razza
                     </Button>
                 </div>
 
                 {showForm && (
-                    <form onSubmit={handleAddBreed} className="add-breed-form slide-down">
+                    <form onSubmit={handleAddOrUpdateBreed} className="add-breed-form slide-down">
+                        <h4 className="form-title">{editingBreedId ? 'Modifica Razza' : 'Nuova Razza'}</h4>
                         <div className="form-row">
                             <div className="photo-upload">
                                 <input
@@ -123,23 +153,26 @@ const CoopDetails = () => {
                             <div className="inputs-col">
                                 <Input
                                     label="Nome Razza"
-                                    value={newBreed.name}
-                                    onChange={(e) => setNewBreed(prev => ({ ...prev, name: e.target.value }))}
+                                    value={formData.name}
+                                    onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
                                     placeholder="Es. Livornese"
                                     required
                                 />
                                 <Input
                                     label="Numero Totale"
                                     type="number"
-                                    value={newBreed.count}
-                                    onChange={(e) => setNewBreed(prev => ({ ...prev, count: e.target.value }))}
+                                    value={formData.count}
+                                    onChange={(e) => setFormData(prev => ({ ...prev, count: e.target.value }))}
                                     placeholder="0"
                                 />
                             </div>
                         </div>
 
                         <div className="form-actions">
-                            <Button type="submit" variant="primary" isLoading={submitting}>Salva Razza</Button>
+                            <Button type="button" variant="ghost" onClick={resetForm}>Annulla</Button>
+                            <Button type="submit" variant="primary" isLoading={submitting}>
+                                {editingBreedId ? 'Salva Modifiche' : 'Salva Razza'}
+                            </Button>
                         </div>
                     </form>
                 )}
@@ -157,6 +190,10 @@ const CoopDetails = () => {
                                 ) : (
                                     <div className="no-image">🐔</div>
                                 )}
+                                {/* Edit Button overlay */}
+                                <button className="edit-breed-btn" onClick={(e) => handleEditClick(e, breed)}>
+                                    <Pencil size={14} />
+                                </button>
                             </div>
                             <div className="breed-info">
                                 <h4>{breed.breed_name}</h4>
