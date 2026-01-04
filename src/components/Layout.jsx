@@ -1,5 +1,6 @@
 import React from 'react';
 import { Egg } from 'lucide-react';
+import Navigation from './Navigation';
 import './Layout.css';
 
 const Layout = ({ children }) => {
@@ -21,6 +22,8 @@ const Layout = ({ children }) => {
             <main className="app-content">
                 {children}
             </main>
+
+            <Navigation />
 
             <footer className="app-footer">
                 <p>© {new Date().getFullYear()} Gestione Avicola</p>
