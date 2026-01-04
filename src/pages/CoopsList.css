@@ -70,6 +70,18 @@
 .coop-info p {
     color: var(--color-text-secondary);
     font-size: var(--font-size-sm);
+    margin-bottom: 8px;
+}
+
+.coop-badge {
+    display: inline-block;
+    background-color: var(--color-bg-primary);
+    border: 1px solid var(--border-color);
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+    color: var(--color-text-primary);
 }
 
 .delete-btn-corner {

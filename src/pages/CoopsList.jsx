@@ -9,6 +9,7 @@ import './CoopsList.css';
 const CoopsList = () => {
     const navigate = useNavigate();
     const [coops, setCoops] = useState([]);
+    const [stats, setStats] = useState({}); // Map coop_id -> total_hens
     const [loading, setLoading] = useState(true);
     const [showForm, setShowForm] = useState(false);
     const [newCoopName, setNewCoopName] = useState('');
@@ -20,8 +21,22 @@ const CoopsList = () => {
     const loadCoops = async () => {
         setLoading(true);
         try {
-            const data = await coopService.getCoops();
-            setCoops(data || []);
+            const [coopsData, breedsData] = await Promise.all([
+                coopService.getCoops(),
+                coopService.getAllBreeds()
+            ]);
+
+            setCoops(coopsData || []);
+
+            // Calculate totals
+            const newStats = {};
+            if (breedsData) {
+                breedsData.forEach(b => {
+                    if (!newStats[b.coop_id]) newStats[b.coop_id] = 0;
+                    newStats[b.coop_id] += (b.total_count || 0);
+                });
+            }
+            setStats(newStats);
         } catch (error) {
             console.error(error);
         } finally {
@@ -88,7 +103,9 @@ const CoopsList = () => {
                         </div>
                         <div className="coop-info">
                             <h3>{coop.name}</h3>
-                            <p>Clicca per gestire</p>
+                            <div className="coop-badge">
+                                {stats[coop.id] || 0} Galline
+                            </div>
                         </div>
                         <button className="delete-btn-corner" onClick={(e) => handleDelete(e, coop.id)}>
                             <Trash2 size={16} />
