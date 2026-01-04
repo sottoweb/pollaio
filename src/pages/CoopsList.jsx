@@ -4,15 +4,18 @@ import { Plus, Home, Trash2 } from 'lucide-react';
 import { coopService } from '../services/coopService';
 import Button from '../components/Button';
 import Input from '../components/Input';
+import { useAuth } from '../context/AuthContext';
 import './CoopsList.css';
 
 const CoopsList = () => {
     const navigate = useNavigate();
+    const { user } = useAuth();
     const [coops, setCoops] = useState([]);
     const [stats, setStats] = useState({}); // Map coop_id -> total_hens
     const [loading, setLoading] = useState(true);
     const [showForm, setShowForm] = useState(false);
     const [newCoopName, setNewCoopName] = useState('');
+    const [newCoopCapacity, setNewCoopCapacity] = useState('');
 
     useEffect(() => {
         loadCoops();
@@ -21,22 +24,25 @@ const CoopsList = () => {
     const loadCoops = async () => {
         setLoading(true);
         try {
-            const [coopsData, breedsData] = await Promise.all([
-                coopService.getCoops(),
-                coopService.getAllBreeds()
-            ]);
-
+            // 1. Fetch Coops reliably
+            const coopsData = await coopService.getCoops();
             setCoops(coopsData || []);
 
-            // Calculate totals
-            const newStats = {};
-            if (breedsData) {
-                breedsData.forEach(b => {
-                    if (!newStats[b.coop_id]) newStats[b.coop_id] = 0;
-                    newStats[b.coop_id] += (b.total_count || 0);
-                });
+            // 2. Fetch Stats independently (don't block UI if this fails)
+            try {
+                const breedsData = await coopService.getAllBreeds();
+                const newStats = {};
+                if (breedsData) {
+                    breedsData.forEach(b => {
+                        if (!newStats[b.coop_id]) newStats[b.coop_id] = 0;
+                        newStats[b.coop_id] += (b.total_count || 0);
+                    });
+                }
+                setStats(newStats);
+            } catch (statsError) {
+                console.warn("Could not load stats:", statsError);
             }
-            setStats(newStats);
+
         } catch (error) {
             console.error(error);
         } finally {
@@ -46,15 +52,19 @@ const CoopsList = () => {
 
     const handleAddCoop = async (e) => {
         e.preventDefault();
-        if (!newCoopName.trim()) return;
 
         try {
-            await coopService.addCoop({ name: newCoopName });
+            await coopService.addCoop({
+                name: newCoopName,
+                max_capacity: parseInt(newCoopCapacity) || 0
+            });
             setNewCoopName('');
+            setNewCoopCapacity('');
             setShowForm(false);
             loadCoops();
         } catch (error) {
-            alert('Errore aggiunta pollaio');
+            console.error(error);
+            alert(`Errore aggiunta pollaio: ${error.message || error.error_description || JSON.stringify(error)}`);
         }
     };
 

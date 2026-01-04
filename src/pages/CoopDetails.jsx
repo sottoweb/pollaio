@@ -4,11 +4,13 @@ import { ArrowLeft, Save, Plus, Camera, Trash2, Pencil } from 'lucide-react';
 import { coopService } from '../services/coopService';
 import Button from '../components/Button';
 import Input from '../components/Input';
+import { useAuth } from '../context/AuthContext';
 import './CoopDetails.css';
 
 const CoopDetails = () => {
     const { id } = useParams();
     const navigate = useNavigate();
+    const { user } = useAuth(); // Get user from auth context
     const [coop, setCoop] = useState(null);
     const [breeds, setBreeds] = useState([]);
     const [loading, setLoading] = useState(true);

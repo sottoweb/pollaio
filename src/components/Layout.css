@@ -7,7 +7,6 @@
 
 .app-header {
     background-color: rgba(30, 41, 59, 0.8);
-    /* Slate 800 with opacity */
     backdrop-filter: blur(12px);
     border-bottom: 1px solid var(--border-color);
     position: sticky;
@@ -71,9 +70,25 @@
     color: var(--color-accent);
 }
 
-.user-profile {
+/* --- USER MENU DROPDOWN --- */
+.user-menu-container {
+    position: relative;
+}
+
+.user-menu-btn {
     display: flex;
     align-items: center;
+    gap: 8px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: var(--radius-md);
+    transition: background-color 0.2s;
+}
+
+.user-menu-btn:hover {
+    background-color: rgba(255, 255, 255, 0.05);
 }
 
 .avatar {
@@ -87,6 +102,83 @@
     justify-content: center;
     font-weight: 700;
     font-size: 14px;
+}
+
+.chevron {
+    color: var(--color-text-secondary);
+    transition: transform 0.2s;
+}
+
+.chevron.rotate {
+    transform: rotate(180deg);
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: 120%;
+    right: 0;
+    width: 200px;
+    background-color: var(--color-bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-xl);
+    padding: 8px;
+    z-index: 1000;
+}
+
+.slide-down-sm {
+    animation: slideDownSm 0.2s ease-out forwards;
+}
+
+@keyframes slideDownSm {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.dropdown-header {
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 4px;
+    font-size: var(--font-size-xs);
+    color: var(--color-text-secondary);
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 10px 12px;
+    border: none;
+    background: none;
+    color: var(--color-text-primary);
+    font-size: var(--font-size-sm);
+    text-align: left;
+    cursor: pointer;
+    border-radius: var(--radius-md);
+    text-decoration: none;
+}
+
+.dropdown-item:hover {
+    background-color: var(--color-bg-primary);
+}
+
+.dropdown-item.text-danger {
+    color: var(--color-danger);
+}
+
+.dropdown-item.text-danger:hover {
+    background-color: rgba(239, 68, 68, 0.1);
 }
 
 .app-content {

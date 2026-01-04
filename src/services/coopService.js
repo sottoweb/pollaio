@@ -15,6 +15,10 @@ export const coopService = {
     },
 
     async addCoop(coop) {
+        if (!coop.organization_id) {
+            console.warn("Adding coop without organization_id");
+        }
+
         const { data, error } = await supabase
             .from('coops')
             .insert([coop])
@@ -34,6 +38,15 @@ export const coopService = {
     },
 
     // --- BREEDS (RAZZE) ---
+
+    async getAllBreeds() {
+        const { data, error } = await supabase
+            .from('coop_breeds')
+            .select('coop_id, total_count');
+
+        if (error) throw error;
+        return data;
+    },
 
     async getBreedsByCoop(coopId) {
         const { data, error } = await supabase

@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Save } from 'lucide-react';
 import { transactionService } from '../services/transactionService';
+import { useAuth } from '../context/AuthContext';
 import Button from '../components/Button';
 import Input from '../components/Input';
 import './Forms.css';
 
 const AddIncome = () => {
     const navigate = useNavigate();
+    const { user } = useAuth();
     const { id } = useParams(); // Get ID from URL if in edit mode
     const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState({

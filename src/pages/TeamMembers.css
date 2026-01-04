@@ -1,0 +1,73 @@
+.avatar-sm {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+}
+
+.text-primary {
+    color: var(--color-text-primary);
+}
+
+.text-secondary {
+    color: var(--color-text-secondary);
+}
+
+.badge {
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.badge-gold {
+    background-color: rgba(251, 191, 36, 0.1);
+    color: var(--color-accent);
+    border: 1px solid rgba(251, 191, 36, 0.3);
+}
+
+.badge-gray {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--color-text-secondary);
+    border: 1px solid var(--border-color);
+}
+
+.action-icon {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.action-icon:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.action-icon.text-danger:hover {
+    background-color: rgba(239, 68, 68, 0.1);
+    color: var(--color-danger);
+}
+
+.form-select {
+    width: 100%;
+    background-color: var(--color-bg-primary);
+    border: 1px solid var(--border-color);
+    color: var(--color-text-primary);
+    padding: 10px;
+    border-radius: var(--radius-md);
+    font-size: 14px;
+}
+
+.form-select:focus {
+    outline: none;
+    border-color: var(--color-accent);
+}

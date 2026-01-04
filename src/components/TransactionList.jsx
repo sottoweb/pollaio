@@ -1,88 +1,107 @@
-import React, { useMemo } from 'react';
+import React, { useState } from 'react';
+import { ArrowUpCircle, ArrowDownCircle, Trash2, Pencil } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { TrendingUp, TrendingDown, Egg, Trash2, Pencil } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 import './TransactionList.css';
-import Button from './Button';
 
-const TransactionList = ({ transactions, onDelete, isLoading }) => {
+const TransactionList = ({ transactions, onDelete }) => {
     const navigate = useNavigate();
+    const { user } = useAuth();
+    const [deletingId, setDeletingId] = useState(null);
+
     // Group transactions by date
-    const groupedTransactions = useMemo(() => {
-        const groups = {};
-        transactions.forEach(t => {
-            const dateStr = new Date(t.date).toLocaleDateString('it-IT', {
-                weekday: 'long',
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
-            });
-            if (!groups[dateStr]) {
-                groups[dateStr] = [];
-            }
-            groups[dateStr].push(t);
-        });
+    const groupedTransactions = transactions.reduce((groups, transaction) => {
+        const date = transaction.date;
+        if (!groups[date]) {
+            groups[date] = [];
+        }
+        groups[date].push(transaction);
         return groups;
-    }, [transactions]);
+    }, {});
 
-    if (isLoading) {
-        return <div className="loading-state">Caricamento transazioni...</div>;
-    }
+    const sortedDates = Object.keys(groupedTransactions).sort((a, b) => new Date(b) - new Date(a));
 
-    if (transactions.length === 0) {
-        return (
-            <div className="empty-state">
-                <Egg size={48} className="empty-icon" />
-                <p>Nessuna transazione presente.</p>
-                <p className="sub-text">Inizia aggiungendo un'entrata o una spesa.</p>
-            </div>
-        );
-    }
+    const handleDelete = async (id) => {
+        if (window.confirm('Sei sicuro di voler eliminare questa transazione?')) {
+            setDeletingId(id);
+            await onDelete(id);
+            setDeletingId(null);
+        }
+    };
+
+    const handleEdit = (transaction) => {
+        if (transaction.type === 'income') {
+            navigate(`/add-income/${transaction.id}`);
+        } else {
+            navigate(`/add-expense/${transaction.id}`);
+        }
+    };
 
     return (
         <div className="transaction-list">
-            {Object.entries(groupedTransactions).map(([date, items]) => (
+            {sortedDates.map(date => (
                 <div key={date} className="date-group">
-                    <h3 className="date-header">{date}</h3>
-                    <div className="transaction-items">
-                        {items.map(t => (
-                            <div key={t.id} className="transaction-item">
-                                <div className="t-icon-wrapper">
-                                    {t.type === 'income' ? (
-                                        <TrendingUp className="icon-income" />
+                    <h3 className="date-header">
+                        {new Date(date).toLocaleDateString('it-IT', {
+                            weekday: 'long',
+                            day: 'numeric',
+                            month: 'long'
+                        })}
+                    </h3>
+                    <div className="transactions-container">
+                        {groupedTransactions[date].map(transaction => (
+                            <div key={transaction.id} className="transaction-item slide-up">
+                                <div className="transaction-icon">
+                                    {transaction.type === 'income' ? (
+                                        <ArrowUpCircle className="text-success" size={24} />
                                     ) : (
-                                        <TrendingDown className="icon-expense" />
+                                        <ArrowDownCircle className="text-danger" size={24} />
                                     )}
                                 </div>
+                                <div className="transaction-details">
+                                    <div className="transaction-main-info">
+                                        <div className="title-row">
+                                            <span className="transaction-title">
+                                                {transaction.type === 'income'
+                                                    ? 'Vendita Uova'
+                                                    : transaction.category}
+                                            </span>
+                                            {transaction.type === 'income' && transaction.eggs_count > 0 && (
+                                                <span className="egg-badge">
+                                                    🥚 {transaction.eggs_count}
+                                                </span>
+                                            )}
+                                        </div>
 
-                                <div className="t-details">
-                                    <span className="t-category">{t.category}</span>
-                                    {t.eggs_count && (
-                                        <span className="t-meta">{t.eggs_count} Uova</span>
-                                    )}
+                                        <span className={`transaction-amount ${transaction.type === 'income' ? 'text-success' : 'text-danger'}`}>
+                                            {transaction.type === 'income' ? '+' : '-'}€{Number(transaction.amount).toFixed(2)}
+                                        </span>
+                                    </div>
+                                    <div className="transaction-meta">
+                                        {transaction.profiles && (
+                                            <span className="transaction-author">
+                                                Inserito da {transaction.profiles.first_name || 'Utente'}
+                                            </span>
+                                        )}
+                                    </div>
                                 </div>
-
-                                <div className="t-amount-wrapper">
-                                    <span className={`t-amount ${t.type}`}>
-                                        {t.type === 'income' ? '+' : '-'} {Number(t.amount).toFixed(2)} €
-                                    </span>
-                                    <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        className="btn-icon-only"
-                                        onClick={() => navigate(t.type === 'income' ? `/edit-income/${t.id}` : `/edit-expense/${t.id}`)}
-                                        aria-label="Modifica transazione"
+                                <div className="transaction-actions">
+                                    <button
+                                        className="action-btn edit-btn"
+                                        onClick={() => handleEdit(transaction)}
+                                        title="Modifica"
                                     >
                                         <Pencil size={16} />
-                                    </Button>
-                                    <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        className="btn-delete"
-                                        onClick={() => onDelete(t.id)}
-                                        aria-label="Elimina transazione"
+                                    </button>
+
+                                    <button
+                                        className="action-btn delete-btn"
+                                        onClick={() => handleDelete(transaction.id)}
+                                        disabled={deletingId === transaction.id}
+                                        title="Elimina"
                                     >
                                         <Trash2 size={16} />
-                                    </Button>
+                                    </button>
                                 </div>
                             </div>
                         ))}

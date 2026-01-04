@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Save } from 'lucide-react';
 import { transactionService } from '../services/transactionService';
+import { useAuth } from '../context/AuthContext';
 import Button from '../components/Button';
 import Input from '../components/Input';
 import './Forms.css';
@@ -11,6 +12,7 @@ const PREDEFINED_CATEGORIES = ['MANGIME', 'VETERINARIO', 'MANUTENZIONE', 'PULIZI
 const AddExpense = () => {
     const navigate = useNavigate();
     const { id } = useParams();
+    const { user } = useAuth();
     const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState({
         amount: '',
@@ -69,7 +71,7 @@ const AddExpense = () => {
                 type: 'expense',
                 amount: parseFloat(formData.amount),
                 date: formData.date,
-                category: category.toUpperCase()
+                category: category.toUpperCase(),
             };
 
             if (isEditMode) {

@@ -77,11 +77,14 @@ const Dashboard = () => {
             const amount = Number(t.amount);
             if (t.type === 'income') {
                 acc.income += amount;
+                if (t.eggs_count) {
+                    acc.eggs += Number(t.eggs_count);
+                }
             } else {
                 acc.expense += amount;
             }
             return acc;
-        }, { income: 0, expense: 0 });
+        }, { income: 0, expense: 0, eggs: 0 });
     }, [filteredTransactions]);
 
     const balance = stats.income - stats.expense;
@@ -132,6 +135,12 @@ const Dashboard = () => {
                     value={balance}
                     type="balance"
                     icon={() => <span className="emoji-icon">⚖️</span>}
+                />
+                <StatsCard
+                    title="Uova Vendute"
+                    value={stats.eggs}
+                    type="eggs"
+                    icon={() => <span className="emoji-icon">🥚</span>}
                 />
             </div>
 

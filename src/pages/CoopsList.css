@@ -75,13 +75,13 @@
 
 .coop-badge {
     display: inline-block;
-    background-color: var(--color-bg-primary);
-    border: 1px solid var(--border-color);
+    background-color: rgba(16, 185, 129, 0.1);
+    border: 1px solid rgba(16, 185, 129, 0.2);
     padding: 2px 8px;
     border-radius: 12px;
     font-size: var(--font-size-xs);
     font-weight: 600;
-    color: var(--color-text-primary);
+    color: var(--color-success);
 }
 
 .delete-btn-corner {

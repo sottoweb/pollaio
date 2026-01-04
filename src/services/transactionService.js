@@ -7,7 +7,7 @@ export const transactionService = {
     async getTransactions() {
         const { data, error } = await supabase
             .from('transactions')
-            .select('*')
+            .select('*, profiles:created_by(first_name, last_name)')
             .order('date', { ascending: false });
 
         if (error) {
@@ -22,6 +22,10 @@ export const transactionService = {
      * @param {Object} transaction 
      */
     async addTransaction(transaction) {
+        if (!transaction.organization_id) {
+            console.warn("Adding transaction without organization_id");
+        }
+
         const { data, error } = await supabase
             .from('transactions')
             .insert([transaction])
@@ -58,7 +62,7 @@ export const transactionService = {
     async getTransactionById(id) {
         const { data, error } = await supabase
             .from('transactions')
-            .select('*')
+            .select('*, profiles:created_by(first_name, last_name)')
             .eq('id', id)
             .single();
 
