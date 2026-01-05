@@ -91,6 +91,11 @@ const TransactionList = ({ transactions, onDelete }) => {
                                             {transaction.type === 'expense' && transaction.suppliers && (
                                                 <span className="transaction-author">
                                                     Fornitore: {transaction.suppliers.name}
+                                                    {transaction.coops && (
+                                                        <span style={{ opacity: 0.7, marginLeft: '6px' }}>
+                                                            • {transaction.coops.name}
+                                                        </span>
+                                                    )}
                                                 </span>
                                             )}
                                         </div>

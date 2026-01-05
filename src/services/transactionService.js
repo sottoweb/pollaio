@@ -7,7 +7,7 @@ export const transactionService = {
     async getTransactions() {
         const { data, error } = await supabase
             .from('transactions')
-            .select('*, profiles:created_by(first_name, last_name), customers(name), suppliers(name)')
+            .select('*, profiles:created_by(first_name, last_name), customers(name), suppliers(name), coops:coop_id(name)')
             .order('date', { ascending: false })
             .order('created_at', { ascending: false });
 
