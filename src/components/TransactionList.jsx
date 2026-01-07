@@ -49,78 +49,89 @@ const TransactionList = ({ transactions, onDelete }) => {
                         })}
                     </h3>
                     <div className="transactions-container">
-                        {groupedTransactions[date].map(transaction => (
-                            <div key={transaction.id} className="transaction-item slide-up">
+                        {groupedTransactions[date].map(transaction => {
+                            const isUnpaidIncome = transaction.type === 'income' && transaction.is_paid === false;
+
+                            return (
                                 <div
-                                    className="transaction-content-clickable"
-                                    onClick={() => handleEdit(transaction)}
-                                    style={{ display: 'flex', flex: 1, alignItems: 'center', cursor: 'pointer' }}
+                                    key={transaction.id}
+                                    className="transaction-item slide-up"
+                                    style={isUnpaidIncome ? {
+                                        backgroundColor: '#FFF9C4', // Stronger Yellow background
+                                        borderLeft: '4px solid #FBC02D'
+                                    } : {}}
                                 >
-                                    <div className="transaction-icon">
-                                        {transaction.type === 'income' ? (
-                                            <ArrowUpCircle className="text-success" size={24} />
-                                        ) : (
-                                            <ArrowDownCircle className="text-danger" size={24} />
-                                        )}
-                                    </div>
-                                    <div className="transaction-details">
-                                        <div className="transaction-main-info">
-                                            <div className="title-row">
-                                                <span className="transaction-title">
-                                                    {transaction.type === 'income'
-                                                        ? 'Vendita Uova'
-                                                        : transaction.category}
+                                    <div
+                                        className="transaction-content-clickable"
+                                        onClick={() => handleEdit(transaction)}
+                                        style={{ display: 'flex', flex: 1, alignItems: 'center', cursor: 'pointer' }}
+                                    >
+                                        <div className="transaction-icon">
+                                            {transaction.type === 'income' ? (
+                                                isUnpaidIncome ? <AlertCircle className="text-warning" size={24} /> : <ArrowUpCircle className="text-success" size={24} />
+                                            ) : (
+                                                <ArrowDownCircle className="text-danger" size={24} />
+                                            )}
+                                        </div>
+                                        <div className="transaction-details">
+                                            <div className="transaction-main-info">
+                                                <div className="title-row">
+                                                    <span className="transaction-title">
+                                                        {transaction.type === 'income'
+                                                            ? 'Vendita Uova'
+                                                            : transaction.category}
+                                                    </span>
+                                                    {transaction.type === 'income' && transaction.eggs_count > 0 && (
+                                                        <span className="egg-badge">
+                                                            🥚 {transaction.eggs_count}
+                                                        </span>
+                                                    )}
+                                                </div>
+
+                                                <span className={`transaction-amount ${transaction.type === 'income' ? 'text-success' : 'text-danger'}`}>
+                                                    {transaction.type === 'income' ? '+' : '-'}€{Number(transaction.amount).toFixed(2)}
                                                 </span>
-                                                {transaction.type === 'income' && transaction.eggs_count > 0 && (
-                                                    <span className="egg-badge">
-                                                        🥚 {transaction.eggs_count}
+                                            </div>
+                                            <div className="transaction-meta">
+                                                {transaction.type === 'income' && transaction.customers && (
+                                                    <span className="transaction-author">
+                                                        Cliente: {transaction.customers.name}
+                                                    </span>
+                                                )}
+                                                {transaction.type === 'expense' && transaction.suppliers && (
+                                                    <span className="transaction-author">
+                                                        Fornitore: {transaction.suppliers.name}
+                                                        {transaction.coops && (
+                                                            <span style={{ opacity: 0.7, marginLeft: '6px' }}>
+                                                                • {transaction.coops.name}
+                                                            </span>
+                                                        )}
                                                     </span>
                                                 )}
                                             </div>
-
-                                            <span className={`transaction-amount ${transaction.type === 'income' ? 'text-success' : 'text-danger'}`}>
-                                                {transaction.type === 'income' ? '+' : '-'}€{Number(transaction.amount).toFixed(2)}
-                                            </span>
-                                        </div>
-                                        <div className="transaction-meta">
-                                            {transaction.type === 'income' && transaction.customers && (
-                                                <span className="transaction-author">
-                                                    Cliente: {transaction.customers.name}
-                                                </span>
-                                            )}
-                                            {transaction.type === 'expense' && transaction.suppliers && (
-                                                <span className="transaction-author">
-                                                    Fornitore: {transaction.suppliers.name}
-                                                    {transaction.coops && (
-                                                        <span style={{ opacity: 0.7, marginLeft: '6px' }}>
-                                                            • {transaction.coops.name}
-                                                        </span>
-                                                    )}
-                                                </span>
-                                            )}
                                         </div>
                                     </div>
-                                </div>
-                                <div className="transaction-actions">
-                                    <button
-                                        className="action-btn edit-btn"
-                                        onClick={(e) => { e.stopPropagation(); handleEdit(transaction); }}
-                                        title="Modifica"
-                                    >
-                                        <Pencil size={16} />
-                                    </button>
+                                    <div className="transaction-actions">
+                                        <button
+                                            className="action-btn edit-btn"
+                                            onClick={(e) => { e.stopPropagation(); handleEdit(transaction); }}
+                                            title="Modifica"
+                                        >
+                                            <Pencil size={16} />
+                                        </button>
 
-                                    <button
-                                        className="action-btn delete-btn"
-                                        onClick={(e) => { e.stopPropagation(); handleDelete(transaction.id); }}
-                                        disabled={deletingId === transaction.id}
-                                        title="Elimina"
-                                    >
-                                        <Trash2 size={16} />
-                                    </button>
+                                        <button
+                                            className="action-btn delete-btn"
+                                            onClick={(e) => { e.stopPropagation(); handleDelete(transaction.id); }}
+                                            disabled={deletingId === transaction.id}
+                                            title="Elimina"
+                                        >
+                                            <Trash2 size={16} />
+                                        </button>
+                                    </div>
                                 </div>
-                            </div>
-                        ))}
+                            );
+                        })}
                     </div>
                 </div>
             ))}

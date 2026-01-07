@@ -80,11 +80,15 @@ const Dashboard = () => {
                 if (t.eggs_count) {
                     acc.eggs += Number(t.eggs_count);
                 }
+                // Check pending
+                if (t.is_paid === false) {
+                    acc.pending += amount;
+                }
             } else {
                 acc.expense += amount;
             }
             return acc;
-        }, { income: 0, expense: 0, eggs: 0 });
+        }, { income: 0, expense: 0, eggs: 0, pending: 0 });
     }, [filteredTransactions]);
 
     const balance = stats.income - stats.expense;
@@ -118,13 +122,32 @@ const Dashboard = () => {
             </div>
 
             <div className="stats-grid">
-                <StatsCard
-                    title="Entrate"
-                    value={stats.income}
-                    type="income"
-                    icon={() => <span className="emoji-icon">💰</span>}
-                    onClick={() => navigate('/add-income')}
-                />
+                {/* Income with Pending Alert */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                    <StatsCard
+                        title="Entrate"
+                        value={stats.income}
+                        type="income"
+                        icon={() => <span className="emoji-icon">💰</span>}
+                        onClick={() => navigate('/add-income')}
+                    />
+                    {stats.pending > 0 && (
+                        <div style={{
+                            background: '#FFF9C4', // Giallo Chiaro/Forte
+                            color: '#FBC02D',
+                            border: '1px solid #FBC02D',
+                            borderRadius: '8px',
+                            padding: '6px',
+                            fontSize: '0.8rem',
+                            fontWeight: 'bold',
+                            textAlign: 'center',
+                            animation: 'pulse 2s infinite'
+                        }}>
+                            ⚠️ €{stats.pending.toFixed(2)} da riscuotere
+                        </div>
+                    )}
+                </div>
+
                 <StatsCard
                     title="Uscite"
                     value={stats.expense}

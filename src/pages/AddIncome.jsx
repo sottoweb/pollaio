@@ -19,7 +19,8 @@ const AddIncome = () => {
         date: new Date().toISOString().split('T')[0],
         eggs_count: '',
         category: 'VENDITA UOVA',
-        customer_id: null
+        customer_id: null,
+        is_paid: true // Default SI
     });
 
     const isEditMode = !!id;
@@ -40,7 +41,8 @@ const AddIncome = () => {
                     date: data.date,
                     eggs_count: data.eggs_count || '',
                     category: data.category,
-                    customer_id: data.customer_id
+                    customer_id: data.customer_id,
+                    is_paid: data.is_paid !== false // Default true if null/undefined
                 });
             }
         } catch (error) {
@@ -68,7 +70,8 @@ const AddIncome = () => {
                 date: formData.date,
                 category: formData.category,
                 eggs_count: formData.eggs_count ? parseInt(formData.eggs_count) : null,
-                customer_id: formData.customer_id
+                customer_id: formData.customer_id,
+                is_paid: formData.is_paid
             };
 
             if (isEditMode) {
@@ -98,41 +101,99 @@ const AddIncome = () => {
             </div>
 
             <form onSubmit={handleSubmit} className="entry-form">
-                <Input
-                    label="Importo (€)"
-                    type="number"
-                    step="0.01"
-                    name="amount"
-                    value={formData.amount}
-                    onChange={handleChange}
-                    placeholder="0.00"
-                    required
-                    autoFocus={!isEditMode}
-                />
 
-                <Input
-                    label="Data"
-                    type="date"
-                    name="date"
-                    value={formData.date}
-                    onChange={handleChange}
-                    required
-                />
+                {/* ROW 1: Importo + Data */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'minmax(120px, 1fr) 1.5fr', gap: '12px' }}>
+                    <Input
+                        label="Importo (€)"
+                        type="number"
+                        step="0.01"
+                        name="amount"
+                        value={formData.amount}
+                        onChange={handleChange}
+                        placeholder="0.00"
+                        required
+                        autoFocus={!isEditMode}
+                        style={{ fontSize: '1.2rem', fontWeight: 'bold' }} // Make amount prominent
+                    />
+                    <Input
+                        label="Data"
+                        type="date"
+                        name="date"
+                        value={formData.date}
+                        onChange={handleChange}
+                        required
+                    />
+                </div>
 
-                <Input
-                    label="Numero Uova (Facoltativo)"
-                    type="number"
-                    name="eggs_count"
-                    value={formData.eggs_count}
-                    onChange={handleChange}
-                    placeholder="0"
-                />
+                {/* ROW 2: Numero Uova + Cliente */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: '12px', alignItems: 'start' }}>
+                    <Input
+                        label="N. Uova"
+                        type="number"
+                        name="eggs_count"
+                        value={formData.eggs_count}
+                        onChange={handleChange}
+                        placeholder="0"
+                    />
+                    {/* CRM Selector wrapper to fit height */}
+                    <div style={{ marginTop: '0' }}>
+                        <label className="input-label" style={{ marginBottom: '6px', display: 'block' }}>Cliente</label>
+                        <CRMSelector
+                            type="customer"
+                            selectedId={formData.customer_id}
+                            onSelect={(id) => setFormData(prev => ({ ...prev, customer_id: id }))}
+                            minimal={true} // Hint to CRMSelector if it supports minimal mode
+                        />
+                    </div>
+                </div>
 
-                <CRMSelector
-                    type="customer"
-                    selectedId={formData.customer_id}
-                    onSelect={(id) => setFormData(prev => ({ ...prev, customer_id: id }))}
-                />
+                {/* ROW 3: Pagato Toggle */}
+                <div style={{
+                    background: 'var(--color-bg-secondary)',
+                    padding: '12px',
+                    borderRadius: '12px',
+                    border: '1px solid var(--border-color)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between'
+                }}>
+                    <span style={{ fontWeight: 500 }}>Incassato?</span>
+                    <div style={{ display: 'flex', gap: '4px', background: 'var(--color-bg-primary)', padding: '4px', borderRadius: '8px' }}>
+                        <button
+                            type="button"
+                            onClick={() => setFormData(prev => ({ ...prev, is_paid: true }))}
+                            style={{
+                                padding: '6px 12px',
+                                borderRadius: '6px',
+                                border: 'none',
+                                background: formData.is_paid ? 'var(--color-success)' : 'transparent',
+                                color: formData.is_paid ? 'white' : 'var(--color-text-secondary)',
+                                fontWeight: formData.is_paid ? 600 : 400,
+                                cursor: 'pointer',
+                                transition: 'all 0.2s'
+                            }}
+                        >
+                            SI
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => setFormData(prev => ({ ...prev, is_paid: false }))}
+                            style={{
+                                padding: '6px 12px',
+                                borderRadius: '6px',
+                                border: 'none',
+                                background: !formData.is_paid ? 'var(--color-warning)' : 'transparent', // Yellow warning for NO
+                                color: !formData.is_paid ? 'black' : 'var(--color-text-secondary)',
+                                fontWeight: !formData.is_paid ? 600 : 400,
+                                cursor: 'pointer',
+                                transition: 'all 0.2s'
+                            }}
+                        >
+                            NO
+                        </button>
+                    </div>
+                </div>
 
                 <Button
                     type="submit"
