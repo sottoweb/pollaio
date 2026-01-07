@@ -3,14 +3,20 @@ import { supabase } from './supabaseClient';
 export const productionService = {
     // Aggiungi una registrazione di raccolta
     async addCollection(collectionData) {
-        // collectionData: { date, items: [{ color, quantity }] }
-        // Trasformiamo l'input in righe singole per il DB
+        // collectionData: { date, items: [{ color, quantity }], coopId }
+
+        const sessionId = crypto.randomUUID(); // ID univoco per il raggruppamento
+        const now = new Date().toISOString(); // Timestamp preciso
+
         const rows = collectionData.items
-            .filter(item => item.quantity > 0) // Salva solo se c'è quantità
+            .filter(item => item.quantity > 0)
             .map(item => ({
                 date: collectionData.date,
                 color: item.color,
-                quantity: parseInt(item.quantity)
+                quantity: parseInt(item.quantity),
+                coop_id: collectionData.coopId || null,
+                session_id: sessionId,
+                recorded_at: now
             }));
 
         if (rows.length === 0) return null;
@@ -22,6 +28,57 @@ export const productionService = {
 
         if (error) throw error;
         return data;
+    },
+
+    // Ottieni le ultime raccolte raggruppate per sessione
+    async getRecentCollections(limit = 10) {
+        const { data, error } = await supabase
+            .from('egg_production')
+            .select(`
+                *,
+                coops ( name )
+            `)
+            .order('recorded_at', { ascending: false })
+            // Prendo abbastanza righe raw per formare 'limit' sessioni (assumendo ~4 righe a sessione)
+            // Meglio prenderne un po' e raggruppare, non sarà perfetto il limit preciso ma va bene.
+            .limit(limit * 5);
+
+        if (error) {
+            // Se la colonna coop_id non esiste ancora (script non lanciato), fallirà.
+            // Gestiamo il caso o lasciamo che il chiamante gestisca.
+            console.error("Error fetching collections:", error);
+            return [];
+        }
+
+        // Raggruppa lato client
+        const groups = {};
+
+        data.forEach(row => {
+            // Usa session_id per raggruppare. Se manca (vecchi dati), raggruppa brutalmente per timestamp o data.
+            // Attenzione: recorded_at potrebbe essere null nei vecchi dati.
+            const uniqueKey = row.session_id || `${row.date}_${row.coop_id || 'unknown'}_${new Date(row.created_at).getHours()}`;
+
+            if (!groups[uniqueKey]) {
+                groups[uniqueKey] = {
+                    id: uniqueKey,
+                    date: row.date,
+                    recorded_at: row.recorded_at || row.created_at,
+                    coop_name: row.coops?.name || 'Pollaio',
+                    total_quantity: 0,
+                    items: []
+                };
+            }
+            groups[uniqueKey].items.push({
+                color: row.color,
+                quantity: row.quantity
+            });
+            groups[uniqueKey].total_quantity += row.quantity;
+        });
+
+        // Ritorna array ordinato decrescente
+        return Object.values(groups).sort((a, b) =>
+            new Date(b.recorded_at) - new Date(a.recorded_at)
+        );
     },
 
     // Ottieni la produzione di un giorno specifico
