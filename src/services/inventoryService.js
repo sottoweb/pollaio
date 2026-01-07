@@ -16,12 +16,12 @@ export const inventoryService = {
         return data;
     },
 
-    async addProduct(name, default_price = 0, unit = 'pz', description = '', image_url = null, priority = 0) {
+    async addProduct(name, default_price = 0, unit = 'pz', description = '', image_url = null, priority = 0, category_id = null) {
         // window.alert(`Tentativo creazione: ${name}`);
         try {
             const { data, error } = await supabase
                 .from('products')
-                .insert([{ name, default_price, unit, description, image_url, priority: priority || 0 }])
+                .insert([{ name, default_price, unit, description, image_url, priority: priority || 0, category_id }])
                 .select();
 
             if (error) {

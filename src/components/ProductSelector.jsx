@@ -1,29 +1,50 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Package, Pencil } from 'lucide-react';
 import { inventoryService } from '../services/inventoryService';
+import { categoryService } from '../services/categoryService';
 import ProductManager from './ProductManager';
 import './Input.css';
 
-const ProductSelector = ({ onSelect }) => {
+const ProductSelector = ({ onSelect, selectedCategory }) => {
     const [products, setProducts] = useState([]);
+    const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showManager, setShowManager] = useState(false);
     const [editingProduct, setEditingProduct] = useState(null);
 
     useEffect(() => {
-        loadProducts();
+        loadData();
     }, []);
 
-    const loadProducts = async () => {
+    const loadData = async () => {
         try {
-            const data = await inventoryService.getProducts();
-            setProducts(data || []);
+            const [prods, cats] = await Promise.all([
+                inventoryService.getProducts(),
+                categoryService.getCategories()
+            ]);
+            setProducts(prods || []);
+            setCategories(cats || []);
         } catch (error) {
             console.error(error);
         } finally {
             setLoading(false);
         }
     };
+
+    // Filter logic
+    const displayedProducts = products.filter(p => {
+        if (!selectedCategory) return true;
+
+        // Find ID for the selected category name
+        // selectedCategory is a string (e.g. 'MANGIME') from AddExpense form
+        // p.category_id is a number from DB products table
+
+        const catObj = categories.find(c => c.name === selectedCategory);
+        if (!catObj) return false; // If category name doesn't exist in DB, show nothing (or show all if ALTRO?)
+
+        // If ALTRO, maybe show items with unknown category? Let's stick to strict match.
+        return p.category_id === catObj.id;
+    });
 
     const handleCreate = () => {
         setEditingProduct(null);
@@ -38,14 +59,14 @@ const ProductSelector = ({ onSelect }) => {
 
     const handleManagerSuccess = async (savedProduct) => {
         console.log("Product saved successfully, reloading list...", savedProduct);
-        await loadProducts();
+        await loadData();
         // Force a small delay and reload again just in case of replication lag
-        setTimeout(() => loadProducts(), 500);
+        setTimeout(() => loadData(), 500);
     };
 
     const manualRefresh = (e) => {
         e.stopPropagation();
-        loadProducts();
+        loadData();
     };
 
     const handleTestCreate = async () => {
@@ -59,7 +80,7 @@ const ProductSelector = ({ onSelect }) => {
                 null
             );
             window.alert("Test completato! Ricarico...");
-            loadProducts();
+            loadData();
         } catch (e) {
             window.alert("Test fallito: " + e.message);
         }
@@ -74,7 +95,7 @@ const ProductSelector = ({ onSelect }) => {
                 gap: '12px',
                 marginBottom: '16px'
             }}>
-                {products.map(p => (
+                {displayedProducts.map(p => (
                     <div
                         key={p.id}
                         onClick={() => onSelect(p)}

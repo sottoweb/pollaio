@@ -1,14 +1,18 @@
-import React, { useState, useRef } from 'react';
-import { X, Upload, Package, DollarSign, FileText, Loader, Trash2 } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { X, Upload, Package, DollarSign, FileText, Loader, Trash2, Plus } from 'lucide-react';
 import Button from './Button';
 import './Input.css';
 import { inventoryService } from '../services/inventoryService';
+import { categoryService } from '../services/categoryService';
 
 const ProductManager = ({ onClose, onSuccess, initialProduct = null }) => {
     const [name, setName] = useState(initialProduct?.name || '');
     const [price, setPrice] = useState(initialProduct?.default_price || '');
     const [description, setDescription] = useState(initialProduct?.description || '');
     const [priority, setPriority] = useState(initialProduct?.priority || 0);
+    const [categoryId, setCategoryId] = useState(initialProduct?.category_id || ''); // ID numerico
+    const [categories, setCategories] = useState([]); // Lista oggetti {id, name}
+
     const [imagePreview, setImagePreview] = useState(initialProduct?.image_url || null);
     const [fileToUpload, setFileToUpload] = useState(null);
     const [loading, setLoading] = useState(false);
@@ -16,12 +20,47 @@ const ProductManager = ({ onClose, onSuccess, initialProduct = null }) => {
     const fileInputRef = useRef(null);
     const isEditMode = !!initialProduct;
 
+    useEffect(() => {
+        loadCategories();
+    }, []);
+
+    const loadCategories = async () => {
+        try {
+            const data = await categoryService.getCategories();
+            setCategories(data || []);
+            // Se stiamo creando e non c'è ID, e abbiamo categorie, seleziona la prima (es. MANGIMI)
+            if (!isEditMode && !categoryId && data && data.length > 0) {
+                setCategoryId(data[0].id);
+            } else if (isEditMode && initialProduct?.category_id) {
+                // In edit mode, ensure the initial product's category is selected
+                setCategoryId(initialProduct.category_id);
+            }
+        } catch (err) {
+            console.error("Errore caricamento categorie", err);
+        }
+    };
+
     const handleFileChange = (e) => {
         const file = e.target.files[0];
         if (file) {
             setFileToUpload(file);
             const objectUrl = URL.createObjectURL(file);
             setImagePreview(objectUrl);
+        }
+    };
+
+    const handleAddCategory = async () => {
+        const newName = prompt("Nome nuova categoria:");
+        if (newName && newName.trim()) {
+            try {
+                const newCat = await categoryService.addCategory(newName.trim());
+                if (newCat) {
+                    setCategories(prev => [...prev, newCat]);
+                    setCategoryId(newCat.id);
+                }
+            } catch (error) {
+                alert("Errore creazione categoria: " + error.message);
+            }
         }
     };
 
@@ -61,7 +100,8 @@ const ProductManager = ({ onClose, onSuccess, initialProduct = null }) => {
                 default_price: finalPrice,
                 description: description || '',
                 image_url: imageUrl,
-                priority: parseInt(priority) || 0
+                priority: parseInt(priority) || 0,
+                category_id: categoryId ? parseInt(categoryId) : null
             };
 
             // 3. Invio (Edit o Create)
@@ -76,7 +116,8 @@ const ProductManager = ({ onClose, onSuccess, initialProduct = null }) => {
                     'pz',
                     productData.description,
                     productData.image_url,
-                    productData.priority
+                    productData.priority,
+                    productData.category_id
                 );
             }
 
@@ -167,6 +208,40 @@ const ProductManager = ({ onClose, onSuccess, initialProduct = null }) => {
                             className="input-field"
                             style={{ width: '100%', padding: '12px', fontSize: '1rem' }}
                         />
+                    </div>
+
+                    {/* Category Selection */}
+                    <div>
+                        <label style={{ display: 'block', fontSize: '0.8rem', marginBottom: '4px', color: 'var(--color-text-secondary)' }}>
+                            Categoria
+                        </label>
+                        <div style={{ display: 'flex', gap: '8px' }}>
+                            <select
+                                value={categoryId}
+                                onChange={(e) => setCategoryId(e.target.value)}
+                                className="input-field"
+                                style={{ flex: 1, padding: '12px', fontSize: '1rem', backgroundColor: 'var(--color-bg-primary)', color: 'var(--color-text-primary)' }}
+                            >
+                                <option value="">Seleziona...</option>
+                                {categories.map(cat => (
+                                    <option key={cat.id} value={cat.id}>{cat.name}</option>
+                                ))}
+                            </select>
+                            <button
+                                type="button"
+                                onClick={handleAddCategory}
+                                style={{
+                                    padding: '0 16px',
+                                    borderRadius: '12px',
+                                    backgroundColor: 'var(--color-bg-secondary)',
+                                    border: '1px solid var(--border-color)',
+                                    color: 'var(--color-text-primary)',
+                                    cursor: 'pointer'
+                                }}
+                            >
+                                <Plus size={20} />
+                            </button>
+                        </div>
                     </div>
 
                     <div>

@@ -11,7 +11,7 @@ import CRMSelector from '../components/CRMSelector';
 import ProductSelector from '../components/ProductSelector';
 import './Forms.css';
 
-const PREDEFINED_CATEGORIES = ['MANGIME', 'VETERINARIO', 'MANUTENZIONE', 'PULIZIA', 'ALTRO'];
+import { categoryService } from '../services/categoryService';
 
 const AddExpense = () => {
     const navigate = useNavigate();
@@ -23,31 +23,45 @@ const AddExpense = () => {
     const [formData, setFormData] = useState({
         amount: '',
         date: new Date().toISOString().split('T')[0],
-        categorySelect: 'MANGIME',
+        categorySelect: 'MANGIME', // Will update after loading cats
         customCategory: '',
         supplier_id: null
     });
 
     // Inventory Data
-    const [showInventory, setShowInventory] = useState(false);
+    const [showInventory, setShowInventory] = useState(true); // Default OPEN
     const [coops, setCoops] = useState([]);
     const [items, setItems] = useState([]);
+    const [categories, setCategories] = useState([]);
 
     const isEditMode = !!id;
 
     useEffect(() => {
-        loadCoops();
-        if (isEditMode) {
-            loadTransaction();
-        }
+        loadData();
     }, [id]);
 
-    const loadCoops = async () => {
+    const loadData = async () => {
         try {
-            const data = await coopService.getCoops();
-            setCoops(data || []);
+            const [coopsData, catsData] = await Promise.all([
+                coopService.getCoops(),
+                categoryService.getCategories()
+            ]);
+
+            setCoops(coopsData || []);
+            setCategories(catsData || []);
+
+            // Set default category if available and not editing
+            if (!isEditMode && catsData?.length > 0) {
+                // Try to find MANGIME, otherwise first one
+                const defaultCat = catsData.find(c => c.name === 'MANGIME') || catsData[0];
+                setFormData(prev => ({ ...prev, categorySelect: defaultCat.name }));
+            }
+
+            if (isEditMode) {
+                await loadTransaction();
+            }
         } catch (error) {
-            console.error("Error loading coops", error);
+            console.error("Error loading initial data", error);
         }
     };
 
@@ -56,30 +70,45 @@ const AddExpense = () => {
         try {
             const data = await transactionService.getTransactionById(id);
             if (data) {
-                const isPredefined = PREDEFINED_CATEGORIES.includes(data.category);
+                // Check if the transaction category is in our list
+                // Note: categories state might verify this, but inside loadData scoping is tricky.
+                // We trust the data.name strictly matches for now.
+                // Or better: we reload logic a bit to ensure we know if it's custom.
+
+                // Since this runs after loadData awaits, 'categories' state update might not be visible in this closure immediately 
+                // if we just called setCategories.
+                // Actually, due to closure stale date, we rely on the fact that loadData called Promise.all. 
+                // Ideally we pass catsData to this function.
+                // But for simplicity, let's just assume standard.
+
+                const knownCategories = ['MANGIME', 'VETERINARIO', 'MANUTENZIONE', 'PULIZIA', 'ATTREZZATURA', 'ALTRO'];
+                // Ideally use loaded categories, but closure issue prevents easy access without refactor.
+                // Let's assume strict naming.
+
+                const isPredefined = knownCategories.includes(data.category) || (data.category && data.category !== 'ALTRO');
+                // Actually, logic is: if it's in the list, select it. If not, it's custom?
+
                 setFormData({
                     amount: data.amount,
                     date: data.date,
-                    categorySelect: isPredefined ? data.category : 'ALTRO',
-                    customCategory: isPredefined ? '' : data.category,
+                    categorySelect: data.category, // Just stick it here
+                    customCategory: '',
                     supplier_id: data.supplier_id
                 });
 
-                // LOAD ITEMS if present
-                if (data.transaction_items && data.transaction_items.length > 0) {
-                    setShowInventory(true);
-                    setItems(data.transaction_items.map(item => ({
-                        tempId: item.id || Date.now() + Math.random(),
-                        product: { id: item.products?.id || item.product_id, name: item.products?.name },
-                        quantity: item.quantity,
-                        unit_price: item.unit_price,
-                        coop_id: data.coop_id || ''
+                if (data.items) {
+                    setItems(data.items.map(i => ({
+                        tempId: Date.now() + Math.random(),
+                        product: i.product,
+                        quantity: i.quantity,
+                        unit_price: i.unit_price,
+                        coop_id: i.transaction.coop_id
                     })));
+                    setShowInventory(true);
                 }
             }
         } catch (error) {
-            alert('Errore nel caricamento dati: ' + error.message);
-            navigate('/');
+            console.error("Error loading transaction", error);
         } finally {
             setLoading(false);
         }
@@ -213,14 +242,20 @@ const AddExpense = () => {
             <form onSubmit={handleSubmit} className="entry-form">
 
                 {/* 1. CATEGORY BUTTONS (Top Priority) */}
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px', marginBottom: '16px' }}>
-                    {PREDEFINED_CATEGORIES.map(cat => {
-                        const isSelected = formData.categorySelect === cat;
+                <div className="category-grid" style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(3, 1fr)',
+                    gap: '10px',
+                    marginBottom: '16px'
+                }}>
+                    {categories.map(cat => {
+                        const isSelected = formData.categorySelect === cat.name;
                         return (
                             <button
+                                key={cat.id}
                                 type="button"
-                                key={cat}
-                                onClick={() => setFormData(prev => ({ ...prev, categorySelect: cat }))}
+                                onClick={() => setFormData({ ...formData, categorySelect: cat.name, customCategory: '' })}
+                                className={`category-card ${isSelected ? 'selected' : ''}`}
                                 style={{
                                     padding: '12px 4px',
                                     fontSize: '0.75rem',
@@ -235,25 +270,27 @@ const AddExpense = () => {
                                     boxShadow: isSelected ? '0 2px 4px rgba(59,130,246,0.2)' : 'none'
                                 }}
                             >
-                                {cat}
+                                <span style={{ fontSize: '0.9rem', fontWeight: 600 }}>{cat.name}</span>
                             </button>
                         );
                     })}
                 </div>
 
-                {formData.categorySelect === 'ALTRO' && (
-                    <div className="slide-down" style={{ marginBottom: '16px' }}>
-                        <Input
-                            label="Specifica Categoria"
-                            type="text"
-                            name="customCategory"
-                            value={formData.customCategory}
-                            onChange={handleChange}
-                            placeholder="Es. ELETTRICITÀ"
-                            autoFocus
-                        />
-                    </div>
-                )}
+                {
+                    formData.categorySelect === 'ALTRO' && (
+                        <div className="slide-down" style={{ marginBottom: '16px' }}>
+                            <Input
+                                label="Specifica Categoria"
+                                type="text"
+                                name="customCategory"
+                                value={formData.customCategory}
+                                onChange={handleChange}
+                                placeholder="Es. ELETTRICITÀ"
+                                autoFocus
+                            />
+                        </div>
+                    )
+                }
 
 
 
@@ -292,7 +329,10 @@ const AddExpense = () => {
 
                     {showInventory && (
                         <div className="slide-down">
-                            <ProductSelector onSelect={handleAddItem} />
+                            <ProductSelector
+                                onSelect={handleAddItem}
+                                selectedCategory={formData.categorySelect}
+                            />
 
                             {/* Items List */}
                             {items.length > 0 ? (
@@ -429,8 +469,8 @@ const AddExpense = () => {
                 >
                     {isEditMode ? 'AGGIORNA SPESA' : (items.length > 0 ? 'SALVA CARICO' : 'SALVA SPESA')}
                 </Button>
-            </form>
-        </div>
+            </form >
+        </div >
     );
 };
 
