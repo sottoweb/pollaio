@@ -8,20 +8,20 @@ export const inventoryService = {
         const { data, error } = await supabase
             .from('products')
             .select('*')
-            // Order by usage_count (popularity) first, then alphabetically
-            .order('usage_count', { ascending: false })
+            // Order by priority (manual importance) first, then alphabetically
+            .order('priority', { ascending: false })
             .order('name', { ascending: true });
 
         if (error) throw error;
         return data;
     },
 
-    async addProduct(name, default_price = 0, unit = 'pz', description = '', image_url = null) {
+    async addProduct(name, default_price = 0, unit = 'pz', description = '', image_url = null, priority = 0) {
         // window.alert(`Tentativo creazione: ${name}`);
         try {
             const { data, error } = await supabase
                 .from('products')
-                .insert([{ name, default_price, unit, description, image_url, usage_count: 0 }])
+                .insert([{ name, default_price, unit, description, image_url, priority: priority || 0 }])
                 .select();
 
             if (error) {
@@ -107,22 +107,6 @@ export const inventoryService = {
     // Takes a list of items: [{ product, qty, price, coop_id }]
     // And creates necessary transactions
     async saveStockLoad(items, date, supplier_id) {
-        // 0. Increment usage stats for selected products (Fire & Forget)
-        items.forEach(async (item) => {
-            if (item.product && item.product.id) {
-                await supabase.rpc('increment_product_usage', { product_id: item.product.id }).catch(err => {
-                    // If RPC fails (e.g. not created yet), manually update
-                    // Fallback manual update (less concurrency safe but works)
-                    supabase.rpc('increment', { row_id: item.product.id }).catch(async () => {
-                        const { data: p } = await supabase.from('products').select('usage_count').eq('id', item.product.id).single();
-                        if (p) {
-                            await supabase.from('products').update({ usage_count: (p.usage_count || 0) + 1 }).eq('id', item.product.id);
-                        }
-                    });
-                });
-            }
-        });
-
         // 1. Group items by coop_id (null = Generals)
         const groups = items.reduce((acc, item) => {
             const key = item.coop_id || 'general';
@@ -203,19 +187,6 @@ export const inventoryService = {
 
         // B. Insert new
         if (items.length > 0) {
-
-            // Increment usage for new items (logic simplified: just bump count for anything currently in list)
-            // Ideally we should only bump for *newly added* items, but usage frequency ~ presence is fine.
-            items.forEach(async (item) => {
-                if (item.product && item.product.id) {
-                    // Simple manual increment to avoid RPC complexity for now if not set up
-                    const { data: p } = await supabase.from('products').select('usage_count').eq('id', item.product.id).single();
-                    if (p) {
-                        await supabase.from('products').update({ usage_count: (p.usage_count || 0) + 1 }).eq('id', item.product.id);
-                    }
-                }
-            });
-
             const newItems = items.map(item => ({
                 transaction_id: transactionId,
                 product_id: item.product.id,
