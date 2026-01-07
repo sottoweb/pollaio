@@ -102,21 +102,39 @@ const AddIncome = () => {
 
             <form onSubmit={handleSubmit} className="entry-form">
 
-                {/* ROW 1: Importo + Data */}
-                <div style={{ display: 'grid', gridTemplateColumns: 'minmax(120px, 1fr) 1.5fr', gap: '12px' }}>
-                    <Input
-                        label="Importo (€)"
-                        type="number"
-                        step="0.01"
-                        name="amount"
-                        value={formData.amount}
-                        onChange={handleChange}
-                        placeholder="0.00"
-                        required
-                        autoFocus={!isEditMode}
-                        style={{ fontSize: '1.2rem', fontWeight: 'bold' }} // Make amount prominent
-                        icon={<span className="text-success" style={{ fontWeight: 'bold', fontSize: '1.2rem' }}>€</span>}
-                    />
+                {/* ROW 1: Importo + N. Uova (Stessa lunghezza ridotta) */}
+                <div style={{ display: 'flex', gap: '12px' }}>
+                    <div style={{ width: '170px' }}>
+                        <Input
+                            label="Importo (€)"
+                            type="number"
+                            step="0.01"
+                            name="amount"
+                            value={formData.amount}
+                            onChange={handleChange}
+                            placeholder="0.00"
+                            required
+                            autoFocus={!isEditMode}
+                            style={{ fontSize: '1.1rem', fontWeight: 'bold', width: '100%' }}
+                            icon={<span className="text-success" style={{ fontWeight: 'bold', fontSize: '1.2rem' }}>€</span>}
+                        />
+                    </div>
+                    <div style={{ width: '170px' }}>
+                        <Input
+                            label="N. Uova"
+                            type="number"
+                            name="eggs_count"
+                            value={formData.eggs_count}
+                            onChange={handleChange}
+                            placeholder="0"
+                            style={{ width: '100%' }}
+                            icon={<span style={{ fontSize: '1.2rem' }}>🥚</span>}
+                        />
+                    </div>
+                </div>
+
+                {/* ROW 2: Data */}
+                <div style={{ minWidth: 0 }}>
                     <Input
                         label="Data"
                         type="date"
@@ -124,34 +142,21 @@ const AddIncome = () => {
                         value={formData.date}
                         onChange={handleChange}
                         required
+                        style={{ width: '100%' }}
                     />
                 </div>
 
-                {/* ROW 2: Numero Uova + Cliente */}
-                <div style={{ display: 'grid', gridTemplateColumns: '80px 1fr', gap: '12px', alignItems: 'start' }}>
-                    <Input
-                        label="N. Uova"
-                        type="number"
-                        name="eggs_count"
-                        value={formData.eggs_count}
-                        onChange={handleChange}
-                        placeholder="0"
-                        icon={<span style={{ fontSize: '1.2rem' }}>🥚</span>}
+                {/* ROW 3: Cliente (Use CRMSelector directly to avoid duplicate label) */}
+                <div style={{ marginBottom: '20px' }}>
+                    <CRMSelector
+                        type="customer"
+                        selectedId={formData.customer_id}
+                        onSelect={(id) => setFormData(prev => ({ ...prev, customer_id: id }))}
+                        minimal={true}
                     />
-
-                    {/* CRM Selector wrapper with input-group class for alignment */}
-                    <div className="input-group">
-                        <label className="input-label">Cliente</label>
-                        <CRMSelector
-                            type="customer"
-                            selectedId={formData.customer_id}
-                            onSelect={(id) => setFormData(prev => ({ ...prev, customer_id: id }))}
-                            minimal={true}
-                        />
-                    </div>
                 </div>
 
-                {/* ROW 3: Pagato Toggle */}
+                {/* ROW 4: Pagato Toggle */}
                 <div style={{
                     background: 'var(--color-bg-secondary)',
                     padding: '12px',
@@ -160,7 +165,7 @@ const AddIncome = () => {
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
-                    marginBottom: '24px' // Add spacing before button
+                    marginBottom: '24px'
                 }}>
                     <span style={{ fontWeight: 500 }}>Incassato?</span>
                     <div style={{ display: 'flex', gap: '4px', background: 'var(--color-bg-primary)', padding: '4px', borderRadius: '8px' }}>

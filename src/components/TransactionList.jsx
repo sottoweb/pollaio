@@ -56,10 +56,7 @@ const TransactionList = ({ transactions, onDelete }) => {
                                 <div
                                     key={transaction.id}
                                     className="transaction-item slide-up"
-                                    style={isUnpaidIncome ? {
-                                        backgroundColor: '#FECACA', // Stronger Soft Red (Red-200)
-                                        borderLeft: '4px solid #EF4444'
-                                    } : {}}
+                                // Removed background style for cleaner look
                                 >
                                     <div
                                         className="transaction-content-clickable"
@@ -68,7 +65,24 @@ const TransactionList = ({ transactions, onDelete }) => {
                                     >
                                         <div className="transaction-icon">
                                             {transaction.type === 'income' ? (
-                                                isUnpaidIncome ? <AlertCircle className="text-warning" size={24} /> : <ArrowUpCircle className="text-success" size={24} />
+                                                isUnpaidIncome ? (
+                                                    <div style={{ position: 'relative' }}>
+                                                        <ArrowUpCircle className="text-secondary" size={24} style={{ opacity: 0.5 }} />
+                                                        <AlertCircle
+                                                            size={14}
+                                                            style={{
+                                                                position: 'absolute',
+                                                                bottom: -2,
+                                                                right: -2,
+                                                                color: '#F59E0B',
+                                                                background: 'white',
+                                                                borderRadius: '50%'
+                                                            }}
+                                                        />
+                                                    </div>
+                                                ) : (
+                                                    <ArrowUpCircle className="text-success" size={24} />
+                                                )
                                             ) : (
                                                 <ArrowDownCircle className="text-danger" size={24} />
                                             )}
@@ -88,9 +102,25 @@ const TransactionList = ({ transactions, onDelete }) => {
                                                     )}
                                                 </div>
 
-                                                <span className={`transaction-amount ${transaction.type === 'income' ? 'text-success' : 'text-danger'}`}>
-                                                    {transaction.type === 'income' ? '+' : '-'}€{Number(transaction.amount).toFixed(2)}
-                                                </span>
+                                                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+                                                    <span className={`transaction-amount ${!isUnpaidIncome && transaction.type === 'income' ? 'text-success' : transaction.type === 'expense' ? 'text-danger' : ''}`}
+                                                        style={isUnpaidIncome ? { color: '#F59E0B' } : {}}
+                                                    >
+                                                        {transaction.type === 'income' ? '+' : '-'}€{Number(transaction.amount).toFixed(2)}
+                                                    </span>
+                                                    {isUnpaidIncome && (
+                                                        <span style={{
+                                                            fontSize: '0.65rem',
+                                                            color: '#EF4444',
+                                                            fontWeight: '800',
+                                                            textTransform: 'uppercase',
+                                                            letterSpacing: '0.5px',
+                                                            marginTop: '2px'
+                                                        }}>
+                                                            Da Riscuotere
+                                                        </span>
+                                                    )}
+                                                </div>
                                             </div>
                                             <div className="transaction-meta">
                                                 {transaction.type === 'income' && transaction.customers && (
