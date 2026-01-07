@@ -38,6 +38,10 @@ const Layout = ({ children }) => {
                         <h1>Uova 2.0</h1>
                     </Link>
                     <div className="header-actions">
+                        <NavLink to="/production" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
+                            <Egg size={20} />
+                            <span>Raccolta</span>
+                        </NavLink>
                         <NavLink to="/coops" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
                             <Grid size={20} />
                             <span>Pollai</span>
