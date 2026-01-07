@@ -128,7 +128,7 @@ const AddIncome = () => {
                 </div>
 
                 {/* ROW 2: Numero Uova + Cliente */}
-                <div style={{ display: 'grid', gridTemplateColumns: '0.6fr 1.5fr', gap: '12px', alignItems: 'start' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '80px 1fr', gap: '12px', alignItems: 'start' }}>
                     <Input
                         label="N. Uova"
                         type="number"
@@ -138,14 +138,15 @@ const AddIncome = () => {
                         placeholder="0"
                         icon={<span style={{ fontSize: '1.2rem' }}>🥚</span>}
                     />
-                    {/* CRM Selector wrapper to fit height */}
-                    <div style={{ marginTop: '0' }}>
-                        <label className="input-label" style={{ marginBottom: '6px', display: 'block' }}>Cliente</label>
+
+                    {/* CRM Selector wrapper with input-group class for alignment */}
+                    <div className="input-group">
+                        <label className="input-label">Cliente</label>
                         <CRMSelector
                             type="customer"
                             selectedId={formData.customer_id}
                             onSelect={(id) => setFormData(prev => ({ ...prev, customer_id: id }))}
-                            minimal={true} // Hint to CRMSelector if it supports minimal mode
+                            minimal={true}
                         />
                     </div>
                 </div>
@@ -158,7 +159,8 @@ const AddIncome = () => {
                     border: '1px solid var(--border-color)',
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'space-between'
+                    justifyContent: 'space-between',
+                    marginBottom: '24px' // Add spacing before button
                 }}>
                     <span style={{ fontWeight: 500 }}>Incassato?</span>
                     <div style={{ display: 'flex', gap: '4px', background: 'var(--color-bg-primary)', padding: '4px', borderRadius: '8px' }}>

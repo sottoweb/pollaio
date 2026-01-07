@@ -122,31 +122,28 @@ const Dashboard = () => {
             </div>
 
             <div className="stats-grid">
-                {/* Income with Pending Alert */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                    <StatsCard
-                        title="Entrate"
-                        value={stats.income}
-                        type="income"
-                        icon={() => <span className="emoji-icon">💰</span>}
-                        onClick={() => navigate('/add-income')}
-                    />
+                <StatsCard
+                    title="Entrate"
+                    value={stats.income}
+                    type="income"
+                    icon={() => <span className="emoji-icon">💰</span>}
+                    onClick={() => navigate('/add-income')}
+                >
                     {stats.pending > 0 && (
                         <div style={{
-                            background: '#FFF9C4', // Giallo Chiaro/Forte
-                            color: '#FBC02D',
-                            border: '1px solid #FBC02D',
-                            borderRadius: '8px',
-                            padding: '6px',
-                            fontSize: '0.8rem',
-                            fontWeight: 'bold',
-                            textAlign: 'center',
-                            animation: 'pulse 2s infinite'
+                            marginTop: '4px',
+                            fontSize: '0.75rem',
+                            fontWeight: '600',
+                            color: '#F59E0B', // Amber-500 equivalent, readable yellow-orange
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '4px'
                         }}>
-                            ⚠️ €{stats.pending.toFixed(2)} da riscuotere
+                            <AlertCircle size={12} />
+                            <span>€{stats.pending.toFixed(2)} da riscuotere</span>
                         </div>
                     )}
-                </div>
+                </StatsCard>
 
                 <StatsCard
                     title="Uscite"

@@ -57,8 +57,8 @@ const TransactionList = ({ transactions, onDelete }) => {
                                     key={transaction.id}
                                     className="transaction-item slide-up"
                                     style={isUnpaidIncome ? {
-                                        backgroundColor: '#FFF9C4', // Stronger Yellow background
-                                        borderLeft: '4px solid #FBC02D'
+                                        backgroundColor: '#FECACA', // Stronger Soft Red (Red-200)
+                                        borderLeft: '4px solid #EF4444'
                                     } : {}}
                                 >
                                     <div

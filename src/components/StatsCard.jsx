@@ -1,7 +1,7 @@
 import React from 'react';
 import './StatsCard.css';
 
-const StatsCard = ({ title, value, type = 'neutral', icon: Icon, onClick }) => {
+const StatsCard = ({ title, value, type = 'neutral', icon: Icon, onClick, children }) => {
     return (
         <div
             className={`stats-card stats-${type} ${onClick ? 'clickable' : ''}`}
@@ -15,6 +15,8 @@ const StatsCard = ({ title, value, type = 'neutral', icon: Icon, onClick }) => {
                     {type === 'income' ? '+' : type === 'expense' ? '-' : (type === 'balance' && value > 0 ? '+' : '')}
                     {Number(value).toFixed(type === 'eggs' ? 0 : 2)} {type === 'eggs' ? '' : '€'}
                 </span>
+                {/* Render optional children (e.g. alerts) */}
+                {children}
             </div>
             {Icon && (
                 <div className="stats-icon-wrapper">
