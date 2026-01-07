@@ -87,38 +87,50 @@ const AddExpense = () => {
 
     // --- Inventory Handlers ---
 
+    const calculateTotal = (currentItems) => {
+        return currentItems.reduce((sum, item) => sum + (item.quantity * item.unit_price), 0);
+    };
+
+    const updateAmountFromItems = (currentItems) => {
+        const total = calculateTotal(currentItems);
+        setFormData(prev => ({ ...prev, amount: total.toFixed(2) }));
+    };
+
+    // --- Inventory Handlers ---
+
     const handleAddItem = (product) => {
         if (!showInventory) setShowInventory(true);
 
-        setItems([...items, {
+        const newItems = [...items, {
             tempId: Date.now(),
             product: product,
             quantity: 1,
             unit_price: product.default_price || 0,
             coop_id: '' // General
-        }]);
+        }];
+
+        setItems(newItems);
+        updateAmountFromItems(newItems);
     };
 
     const updateItem = (id, field, value) => {
-        setItems(items.map(item =>
+        const newItems = items.map(item =>
             item.tempId === id ? { ...item, [field]: value } : item
-        ));
+        );
+        setItems(newItems);
+
+        // Update total ONLY if we are changing quantity or price
+        if (field === 'quantity' || field === 'unit_price') {
+            updateAmountFromItems(newItems);
+        }
     };
 
     const removeItem = (id) => {
-        setItems(items.filter(item => item.tempId !== id));
+        const newItems = items.filter(item => item.tempId !== id);
+        setItems(newItems);
+        updateAmountFromItems(newItems);
     };
 
-    const calculateTotal = () => {
-        return items.reduce((sum, item) => sum + (item.quantity * item.unit_price), 0);
-    };
-
-    // Update amount when items change
-    useEffect(() => {
-        if (items.length > 0) {
-            setFormData(prev => ({ ...prev, amount: calculateTotal().toFixed(2) }));
-        }
-    }, [items]);
 
 
     // --- Form Handlers ---
@@ -243,34 +255,7 @@ const AddExpense = () => {
                     </div>
                 )}
 
-                {/* 2. AMOUNT (Big & Central) */}
-                <div style={{ marginBottom: '20px' }}>
-                    <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--color-text-secondary)', marginBottom: '4px' }}>
-                        Importo Totale (€)
-                    </label>
-                    <input
-                        type="number"
-                        step="0.01"
-                        name="amount"
-                        value={formData.amount}
-                        onChange={handleChange}
-                        placeholder="0.00"
-                        required
-                        // Removed readOnly and className logic to always allow editing
-                        style={{
-                            width: '100%',
-                            fontSize: '2rem',
-                            fontWeight: 'bold',
-                            padding: '12px',
-                            textAlign: 'center',
-                            borderRadius: '16px',
-                            border: '1px solid var(--border-color)',
-                            backgroundColor: 'var(--color-bg-primary)',
-                            color: 'var(--color-text-primary)',
-                            outline: 'none'
-                        }}
-                    />
-                </div>
+
 
                 {/* 3. SECONDARY INFO (Date & Supplier) - Stacked Layout */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '20px' }}>
@@ -291,23 +276,7 @@ const AddExpense = () => {
                     />
                 </div>
 
-                {/* 4. SUBMIT BUTTON (Sticky-ish or Prominent) */}
-                <Button
-                    type="submit"
-                    variant="danger"
-                    size="lg"
-                    isLoading={loading}
-                    icon={<Save size={20} />}
-                    className="submit-btn"
-                    style={{
-                        width: '100%',
-                        padding: '16px',
-                        fontSize: '1.1rem',
-                        boxShadow: '0 4px 12px rgba(239, 68, 68, 0.3)'
-                    }}
-                >
-                    {isEditMode ? 'AGGIORNA SPESA' : (items.length > 0 ? 'SALVA CARICO' : 'SALVA SPESA')}
-                </Button>
+
 
                 {/* 5. INVENTORY (Collapsible/Optional) */}
                 <div className="inventory-section" style={{ marginTop: '30px', borderTop: '1px solid var(--border-color)', paddingTop: '20px' }}>
@@ -413,6 +382,53 @@ const AddExpense = () => {
                         </div>
                     )}
                 </div>
+
+                {/* 4. AMOUNT (Moved Down) */}
+                <div style={{ marginBottom: '20px', marginTop: '20px' }}>
+                    <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--color-text-secondary)', marginBottom: '4px' }}>
+                        Importo Totale (€)
+                    </label>
+                    <input
+                        type="number"
+                        step="0.01"
+                        name="amount"
+                        value={formData.amount}
+                        onChange={handleChange}
+                        placeholder="0.00"
+                        required
+                        style={{
+                            width: '100%',
+                            fontSize: '2rem',
+                            fontWeight: 'bold',
+                            padding: '12px',
+                            textAlign: 'center',
+                            borderRadius: '16px',
+                            border: '1px solid var(--border-color)',
+                            backgroundColor: 'var(--color-bg-primary)',
+                            color: 'var(--color-text-primary)',
+                            outline: 'none'
+                        }}
+                    />
+                </div>
+
+                {/* 5. SUBMIT BUTTON (Bottom) */}
+                <Button
+                    type="submit"
+                    variant="danger"
+                    size="lg"
+                    isLoading={loading}
+                    icon={<Save size={20} />}
+                    className="submit-btn"
+                    style={{
+                        width: '100%',
+                        padding: '16px',
+                        fontSize: '1.1rem',
+                        boxShadow: '0 4px 12px rgba(239, 68, 68, 0.3)',
+                        marginBottom: '30px'
+                    }}
+                >
+                    {isEditMode ? 'AGGIORNA SPESA' : (items.length > 0 ? 'SALVA CARICO' : 'SALVA SPESA')}
+                </Button>
             </form>
         </div>
     );
