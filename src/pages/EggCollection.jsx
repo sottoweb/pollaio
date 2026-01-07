@@ -5,9 +5,9 @@ import { Save, Calendar, ArrowLeft } from 'lucide-react';
 import { Toaster, toast } from 'react-hot-toast';
 
 const EGG_COLORS = [
+    { id: 'VERDE', label: 'Verdi / Blu', hex: '#D1FAE5', icon: '🟢' },
     { id: 'ROSA', label: 'Classiche (Rosa)', hex: '#E6C6A0', icon: '🥚' },
     { id: 'BIANCO', label: 'Bianche', hex: '#F9FAFB', icon: '⚪' },
-    { id: 'VERDE', label: 'Verdi / Blu', hex: '#D1FAE5', icon: '🟢' },
     { id: 'CIOCCOLATO', label: 'Cioccolato', hex: '#78350F', icon: '🟤' }
 ];
 
@@ -68,7 +68,7 @@ const EggCollection = () => {
     };
 
     return (
-        <div className="egg-collection-page" style={{ padding: '10px 0' }}>
+        <div className="egg-collection-page" style={{ padding: '2px 0' }}>
             <Toaster position="top-center" />
 
             <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxWidth: '600px', margin: '0 auto' }}>
