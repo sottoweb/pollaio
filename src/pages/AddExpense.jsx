@@ -344,34 +344,56 @@ const AddExpense = () => {
                                                 </button>
                                             </div>
 
-                                            <div className="stock-controls" style={{ display: 'grid', gridTemplateColumns: '70px 80px 1fr', gap: '8px' }}>
-                                                <div>
-                                                    <label style={{ fontSize: '0.7rem', opacity: 0.7 }}>Qta</label>
+                                            <div className="stock-controls" style={{ display: 'grid', gridTemplateColumns: '50px 70px 1fr', gap: '6px', alignItems: 'center' }}>
+                                                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                                    <label style={{ fontSize: '0.65rem', opacity: 0.7, marginBottom: '2px' }}>Qta</label>
                                                     <input
                                                         type="number"
                                                         className="input-field"
                                                         value={item.quantity}
-                                                        onChange={(e) => updateItem(item.tempId, 'quantity', parseFloat(e.target.value))}
-                                                        style={{ padding: '4px', height: '32px', textAlign: 'center' }}
+                                                        onChange={(e) => updateItem(item.tempId, 'quantity', parseFloat(e.target.value) || '')}
+                                                        onFocus={(e) => e.target.select()}
+                                                        style={{
+                                                            padding: '0',
+                                                            height: '34px',
+                                                            textAlign: 'center',
+                                                            fontSize: '0.9rem',
+                                                            minWidth: 0 // Prevent overflow
+                                                        }}
                                                     />
                                                 </div>
-                                                <div>
-                                                    <label style={{ fontSize: '0.7rem', opacity: 0.7 }}>Prezzo</label>
+                                                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                                    <label style={{ fontSize: '0.65rem', opacity: 0.7, marginBottom: '2px' }}>Prezzo</label>
                                                     <input
                                                         type="number"
                                                         className="input-field"
                                                         value={item.unit_price}
-                                                        onChange={(e) => updateItem(item.tempId, 'unit_price', parseFloat(e.target.value))}
-                                                        style={{ padding: '4px', height: '32px', textAlign: 'center' }}
+                                                        onChange={(e) => updateItem(item.tempId, 'unit_price', parseFloat(e.target.value) || 0)}
+                                                        onFocus={(e) => e.target.select()}
+                                                        placeholder="0.00"
+                                                        style={{
+                                                            padding: '0',
+                                                            height: '34px',
+                                                            textAlign: 'center',
+                                                            fontSize: '0.9rem',
+                                                            minWidth: 0
+                                                        }}
                                                     />
                                                 </div>
-                                                <div>
-                                                    <label style={{ fontSize: '0.7rem', opacity: 0.7 }}>Destinazione</label>
+                                                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                                    <label style={{ fontSize: '0.65rem', opacity: 0.7, marginBottom: '2px' }}>Destinazione</label>
                                                     <select
                                                         className="input-field"
                                                         value={item.coop_id}
                                                         onChange={(e) => updateItem(item.tempId, 'coop_id', e.target.value)}
-                                                        style={{ padding: '0 4px', fontSize: '0.8rem', height: '32px' }}
+                                                        style={{
+                                                            padding: '0 4px',
+                                                            fontSize: '0.8rem',
+                                                            height: '34px',
+                                                            minWidth: 0,
+                                                            whiteSpace: 'nowrap',
+                                                            textOverflow: 'ellipsis'
+                                                        }}
                                                     >
                                                         <option value="">Generale</option>
                                                         {coops.map(c => (
