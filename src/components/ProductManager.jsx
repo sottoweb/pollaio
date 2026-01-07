@@ -8,6 +8,7 @@ const ProductManager = ({ onClose, onSuccess, initialProduct = null }) => {
     const [name, setName] = useState(initialProduct?.name || '');
     const [price, setPrice] = useState(initialProduct?.default_price || '');
     const [description, setDescription] = useState(initialProduct?.description || '');
+    const [priority, setPriority] = useState(initialProduct?.priority || 0);
     const [imagePreview, setImagePreview] = useState(initialProduct?.image_url || null);
     const [fileToUpload, setFileToUpload] = useState(null);
     const [loading, setLoading] = useState(false);
@@ -59,7 +60,8 @@ const ProductManager = ({ onClose, onSuccess, initialProduct = null }) => {
                 name: name.trim(),
                 default_price: finalPrice,
                 description: description || '',
-                image_url: imageUrl
+                image_url: imageUrl,
+                priority: parseInt(priority) || 0
             };
 
             // 3. Invio (Edit o Create)
@@ -73,7 +75,8 @@ const ProductManager = ({ onClose, onSuccess, initialProduct = null }) => {
                     productData.default_price,
                     'pz',
                     productData.description,
-                    productData.image_url
+                    productData.image_url,
+                    productData.priority
                 );
             }
 
@@ -174,6 +177,18 @@ const ProductManager = ({ onClose, onSuccess, initialProduct = null }) => {
                                 min="0"
                                 step="0.01"
                                 className="input-field"
+                            />
+                        </div>
+                        <div className="input-group" style={{ flex: 1 }}>
+                            <input
+                                type="number"
+                                placeholder="Priorità (0-100)"
+                                value={priority}
+                                onChange={e => setPriority(e.target.value)}
+                                min="0"
+                                step="1"
+                                className="input-field"
+                                title="Priorità di ordinamento (più alto = appare prima)"
                             />
                         </div>
                     </div>
