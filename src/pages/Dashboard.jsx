@@ -2,7 +2,6 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Minus, Filter, Calendar, LayoutDashboard, TrendingUp, AlertCircle, Package, ArrowUpRight, ArrowDownRight } from 'lucide-react';
 import { transactionService } from '../services/transactionService';
-import { productionService } from '../services/productionService';
 import TransactionList from '../components/TransactionList';
 import StatsCard from '../components/StatsCard';
 import Button from '../components/Button';
@@ -11,26 +10,22 @@ import './Dashboard.css';
 const Dashboard = () => {
     const navigate = useNavigate();
     const [transactions, setTransactions] = useState([]);
-    const [productionData, setProductionData] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [timeFilter, setTimeFilter] = useState('month'); // day, week, month, year
 
-    // Load data on mount
+    // Load transactions on mount
     useEffect(() => {
-        loadData();
+        loadTransactions();
     }, []);
 
-    const loadData = async () => {
+    const loadTransactions = async () => {
         setIsLoading(true);
         try {
-            const [trxData, prodData] = await Promise.all([
-                transactionService.getTransactions(),
-                productionService.getProductionStats('2000-01-01', '2100-01-01') // Load all for now, optimize later if needed
-            ]);
-            setTransactions(trxData || []);
-            setProductionData(prodData || []);
+            const data = await transactionService.getTransactions();
+            setTransactions(data || []);
         } catch (error) {
-            console.error('Failed to load data', error);
+            console.error('Failed to load transactions', error);
+            // In a real app, show error toast
         } finally {
             setIsLoading(false);
         }
@@ -40,7 +35,7 @@ const Dashboard = () => {
         if (window.confirm('Sei sicuro di voler eliminare questa transazione?')) {
             try {
                 await transactionService.deleteTransaction(id);
-                loadData(); // Reload list
+                await loadTransactions(); // Reload list
             } catch (error) {
                 console.error('Delete failed', error);
             }
@@ -52,42 +47,29 @@ const Dashboard = () => {
         const now = new Date();
         const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
-        return transactions.filter(t => filterByTime(t.date, timeFilter, today, now));
+        return transactions.filter(t => {
+            const tDate = new Date(t.date);
+            // Normalize tDate to midnight for correct day comparison
+            const tDay = new Date(tDate.getFullYear(), tDate.getMonth(), tDate.getDate());
+
+            switch (timeFilter) {
+                case 'day':
+                    return tDay.getTime() === today.getTime();
+                case 'week':
+                    // Simple "current week" starting Monday
+                    const day = today.getDay() || 7; // Get current day number, make Sunday (0) -> 7
+                    if (day !== 1) today.setHours(-24 * (day - 1)); // Set to previous Monday
+                    const startOfWeek = today;
+                    return tDate >= startOfWeek;
+                case 'month':
+                    return tDate.getMonth() === now.getMonth() && tDate.getFullYear() === now.getFullYear();
+                case 'year':
+                    return tDate.getFullYear() === now.getFullYear();
+                default:
+                    return true;
+            }
+        });
     }, [transactions, timeFilter]);
-
-    // Filter Production
-    const filteredProduction = useMemo(() => {
-        const now = new Date();
-        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-
-        return productionData.filter(p => filterByTime(p.date, timeFilter, today, now));
-    }, [productionData, timeFilter]);
-
-    const productionTotal = useMemo(() => {
-        return filteredProduction.reduce((acc, curr) => acc + (curr.quantity || 0), 0);
-    }, [filteredProduction]);
-
-    // Helper for date filtering
-    const filterByTime = (dateStr, filter, today, now) => {
-        const d = new Date(dateStr);
-        const dDay = new Date(d.getFullYear(), d.getMonth(), d.getDate());
-
-        switch (filter) {
-            case 'day':
-                return dDay.getTime() === today.getTime();
-            case 'week':
-                const day = today.getDay() || 7;
-                const startOfWeek = new Date(today);
-                if (day !== 1) startOfWeek.setHours(-24 * (day - 1));
-                return d >= startOfWeek;
-            case 'month':
-                return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
-            case 'year':
-                return d.getFullYear() === now.getFullYear();
-            default:
-                return true;
-        }
-    };
 
     // Calculate stats from filtered transactions
     const stats = useMemo(() => {
@@ -180,17 +162,9 @@ const Dashboard = () => {
                     title="Uova Vendute"
                     value={stats.eggs}
                     type="eggs"
-                    icon={() => <span className="emoji-icon">📤</span>}
-                />
-                <StatsCard
-                    title="Uova Raccolte"
-                    value={productionTotal}
-                    type="neutral"
-                    icon={() => <span className="emoji-icon">🧺</span>}
-                    onClick={() => navigate('/production')}
+                    icon={() => <span className="emoji-icon">🥚</span>}
                 />
             </div>
-
 
             <div className="list-section">
                 <h3>Transazioni Recenti</h3>

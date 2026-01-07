@@ -72,6 +72,18 @@
     background-color: rgba(251, 191, 36, 0.1);
 }
 
+/* Eggs & Production Style (Amber/Gold) */
+.stats-eggs .stats-value,
+.stats-production .stats-value {
+    color: #F59E0B;
+}
+
+.stats-eggs .stats-icon-wrapper,
+.stats-production .stats-icon-wrapper {
+    color: #F59E0B;
+    background-color: rgba(245, 158, 11, 0.1);
+}
+
 /* Clickable State */
 .stats-card.clickable {
     cursor: pointer;
