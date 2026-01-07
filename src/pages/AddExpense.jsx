@@ -256,8 +256,7 @@ const AddExpense = () => {
                         onChange={handleChange}
                         placeholder="0.00"
                         required
-                        readOnly={items.length > 0}
-                        className={items.length > 0 ? "input-readonly" : ""}
+                        // Removed readOnly and className logic to always allow editing
                         style={{
                             width: '100%',
                             fontSize: '2rem',
@@ -273,26 +272,23 @@ const AddExpense = () => {
                     />
                 </div>
 
-                {/* 3. SECONDARY INFO (Date & Supplier) - Row Layout */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '20px' }}>
-                    <div>
-                        <Input
-                            label="Data"
-                            type="date"
-                            name="date"
-                            value={formData.date}
-                            onChange={handleChange}
-                            required
-                        />
-                    </div>
-                    <div>
-                        <CRMSelector
-                            type="supplier"
-                            label="Fornitore (Opz.)"
-                            selectedId={formData.supplier_id}
-                            onSelect={(id) => setFormData(prev => ({ ...prev, supplier_id: id }))}
-                        />
-                    </div>
+                {/* 3. SECONDARY INFO (Date & Supplier) - Stacked Layout */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '20px' }}>
+                    <Input
+                        label="Data"
+                        type="date"
+                        name="date"
+                        value={formData.date}
+                        onChange={handleChange}
+                        required
+                    />
+
+                    <CRMSelector
+                        type="supplier"
+                        label="Fornitore (Opz.)"
+                        selectedId={formData.supplier_id}
+                        onSelect={(id) => setFormData(prev => ({ ...prev, supplier_id: id }))}
+                    />
                 </div>
 
                 {/* 4. SUBMIT BUTTON (Sticky-ish or Prominent) */}
@@ -348,7 +344,7 @@ const AddExpense = () => {
                                                 </button>
                                             </div>
 
-                                            <div className="stock-controls" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1.2fr', gap: '8px' }}>
+                                            <div className="stock-controls" style={{ display: 'grid', gridTemplateColumns: '70px 80px 1fr', gap: '8px' }}>
                                                 <div>
                                                     <label style={{ fontSize: '0.7rem', opacity: 0.7 }}>Qta</label>
                                                     <input
@@ -356,7 +352,7 @@ const AddExpense = () => {
                                                         className="input-field"
                                                         value={item.quantity}
                                                         onChange={(e) => updateItem(item.tempId, 'quantity', parseFloat(e.target.value))}
-                                                        style={{ padding: '4px 8px', height: '36px' }}
+                                                        style={{ padding: '4px', height: '32px', textAlign: 'center' }}
                                                     />
                                                 </div>
                                                 <div>
@@ -366,7 +362,7 @@ const AddExpense = () => {
                                                         className="input-field"
                                                         value={item.unit_price}
                                                         onChange={(e) => updateItem(item.tempId, 'unit_price', parseFloat(e.target.value))}
-                                                        style={{ padding: '4px 8px', height: '36px' }}
+                                                        style={{ padding: '4px', height: '32px', textAlign: 'center' }}
                                                     />
                                                 </div>
                                                 <div>
@@ -375,7 +371,7 @@ const AddExpense = () => {
                                                         className="input-field"
                                                         value={item.coop_id}
                                                         onChange={(e) => updateItem(item.tempId, 'coop_id', e.target.value)}
-                                                        style={{ padding: '0 4px', fontSize: '0.8rem', height: '36px' }}
+                                                        style={{ padding: '0 4px', fontSize: '0.8rem', height: '32px' }}
                                                     >
                                                         <option value="">Generale</option>
                                                         {coops.map(c => (
