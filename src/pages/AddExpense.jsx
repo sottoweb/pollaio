@@ -199,135 +199,103 @@ const AddExpense = () => {
             </div>
 
             <form onSubmit={handleSubmit} className="entry-form">
-                <Input
-                    label="Data"
-                    type="date"
-                    name="date"
-                    value={formData.date}
-                    onChange={handleChange}
-                    required
-                />
 
-                <CRMSelector
-                    type="supplier"
-                    selectedId={formData.supplier_id}
-                    onSelect={(id) => setFormData(prev => ({ ...prev, supplier_id: id }))}
-                />
-
-                <div className="input-group">
-                    <label className="input-label" htmlFor="cat-select">Causale</label>
-                    <select
-                        id="cat-select"
-                        name="categorySelect"
-                        value={formData.categorySelect}
-                        onChange={handleChange}
-                        className="input-field select-field"
-                    >
-                        {PREDEFINED_CATEGORIES.map(cat => (
-                            <option key={cat} value={cat}>{cat}</option>
-                        ))}
-                    </select>
+                {/* 1. CATEGORY BUTTONS (Top Priority) */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px', marginBottom: '16px' }}>
+                    {PREDEFINED_CATEGORIES.map(cat => {
+                        const isSelected = formData.categorySelect === cat;
+                        return (
+                            <button
+                                type="button"
+                                key={cat}
+                                onClick={() => setFormData(prev => ({ ...prev, categorySelect: cat }))}
+                                style={{
+                                    padding: '12px 4px',
+                                    fontSize: '0.75rem',
+                                    fontWeight: isSelected ? '700' : '500',
+                                    borderRadius: '12px',
+                                    border: isSelected ? '2px solid var(--color-primary)' : '1px solid var(--border-color)',
+                                    backgroundColor: isSelected ? 'rgba(59, 130, 246, 0.15)' : 'var(--color-bg-secondary)',
+                                    color: isSelected ? 'var(--color-primary)' : 'var(--color-text-secondary)',
+                                    cursor: 'pointer',
+                                    transition: 'all 0.2s ease',
+                                    textTransform: 'uppercase',
+                                    boxShadow: isSelected ? '0 2px 4px rgba(59,130,246,0.2)' : 'none'
+                                }}
+                            >
+                                {cat}
+                            </button>
+                        );
+                    })}
                 </div>
 
                 {formData.categorySelect === 'ALTRO' && (
-                    <Input
-                        label="Descrizione / Dettagli"
-                        type="text"
-                        name="customCategory"
-                        value={formData.customCategory}
-                        onChange={handleChange}
-                        placeholder="Es. ELETTRICITÀ"
-                        className="slide-down"
-                    />
+                    <div className="slide-down" style={{ marginBottom: '16px' }}>
+                        <Input
+                            label="Specifica Categoria"
+                            type="text"
+                            name="customCategory"
+                            value={formData.customCategory}
+                            onChange={handleChange}
+                            placeholder="Es. ELETTRICITÀ"
+                            autoFocus
+                        />
+                    </div>
                 )}
 
-                <Input
-                    label="Importo Totale (€)"
-                    type="number"
-                    step="0.01"
-                    name="amount"
-                    value={formData.amount}
-                    onChange={handleChange}
-                    placeholder="0.00"
-                    required
-                    readOnly={items.length > 0} // Read-only if calculated from items
-                    className={items.length > 0 ? "input-readonly" : ""}
-                />
-
-                {/* --- INVENTORY SECTION --- */}
-                <div className="inventory-section" style={{ marginTop: '20px', borderTop: '1px dashed var(--border-color)', paddingTop: '20px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-                        <Box size={20} className="text-muted" />
-                        <h3 style={{ fontSize: '1rem', margin: 0 }}>Dettaglio Prodotti (Opzionale)</h3>
-                    </div>
-
-                    <ProductSelector onSelect={handleAddItem} />
-
-                    {/* Items List */}
-                    {items.length > 0 ? (
-                        <div className="items-list" style={{ marginTop: '12px' }}>
-                            {items.map(item => (
-                                <div key={item.tempId} className="stock-item-row" style={{
-                                    background: 'var(--color-bg-secondary)',
-                                    padding: '12px',
-                                    borderRadius: '12px',
-                                    marginBottom: '8px',
-                                    border: '1px solid var(--border-color)',
-                                    animation: 'slideUp 0.2s ease'
-                                }}>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-                                        <span style={{ fontWeight: 'bold' }}>{item.product.name}</span>
-                                        <button type="button" onClick={() => removeItem(item.tempId)} style={{ color: 'var(--color-danger)', background: 'none', border: 'none' }}>
-                                            <Trash2 size={18} />
-                                        </button>
-                                    </div>
-
-                                    <div className="stock-controls" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1.2fr', gap: '8px' }}>
-                                        <div>
-                                            <label style={{ fontSize: '0.7rem', opacity: 0.7 }}>Qta</label>
-                                            <input
-                                                type="number"
-                                                className="input-field"
-                                                value={item.quantity}
-                                                onChange={(e) => updateItem(item.tempId, 'quantity', parseFloat(e.target.value))}
-                                                style={{ padding: '4px 8px', height: '36px' }}
-                                            />
-                                        </div>
-                                        <div>
-                                            <label style={{ fontSize: '0.7rem', opacity: 0.7 }}>Prezzo</label>
-                                            <input
-                                                type="number"
-                                                className="input-field"
-                                                value={item.unit_price}
-                                                onChange={(e) => updateItem(item.tempId, 'unit_price', parseFloat(e.target.value))}
-                                                style={{ padding: '4px 8px', height: '36px' }}
-                                            />
-                                        </div>
-                                        <div>
-                                            <label style={{ fontSize: '0.7rem', opacity: 0.7 }}>Destinazione</label>
-                                            <select
-                                                className="input-field"
-                                                value={item.coop_id}
-                                                onChange={(e) => updateItem(item.tempId, 'coop_id', e.target.value)}
-                                                style={{ padding: '0 4px', fontSize: '0.8rem', height: '36px' }}
-                                            >
-                                                <option value="">Generale</option>
-                                                {coops.map(c => (
-                                                    <option key={c.id} value={c.id}>{c.name}</option>
-                                                ))}
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    ) : (
-                        <div style={{ padding: '20px', textAlign: 'center', opacity: 0.5, fontStyle: 'italic' }}>
-                            Nessun prodotto in lista. Aggiungine uno qui sopra!
-                        </div>
-                    )}
+                {/* 2. AMOUNT (Big & Central) */}
+                <div style={{ marginBottom: '20px' }}>
+                    <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--color-text-secondary)', marginBottom: '4px' }}>
+                        Importo Totale (€)
+                    </label>
+                    <input
+                        type="number"
+                        step="0.01"
+                        name="amount"
+                        value={formData.amount}
+                        onChange={handleChange}
+                        placeholder="0.00"
+                        required
+                        readOnly={items.length > 0}
+                        className={items.length > 0 ? "input-readonly" : ""}
+                        style={{
+                            width: '100%',
+                            fontSize: '2rem',
+                            fontWeight: 'bold',
+                            padding: '12px',
+                            textAlign: 'center',
+                            borderRadius: '16px',
+                            border: '1px solid var(--border-color)',
+                            backgroundColor: 'var(--color-bg-primary)',
+                            color: 'var(--color-text-primary)',
+                            outline: 'none'
+                        }}
+                    />
                 </div>
 
+                {/* 3. SECONDARY INFO (Date & Supplier) - Row Layout */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '20px' }}>
+                    <div>
+                        <Input
+                            label="Data"
+                            type="date"
+                            name="date"
+                            value={formData.date}
+                            onChange={handleChange}
+                            required
+                        />
+                    </div>
+                    <div>
+                        <CRMSelector
+                            type="supplier"
+                            label="Fornitore (Opz.)"
+                            selectedId={formData.supplier_id}
+                            onSelect={(id) => setFormData(prev => ({ ...prev, supplier_id: id }))}
+                        />
+                    </div>
+                </div>
+
+                {/* 4. SUBMIT BUTTON (Sticky-ish or Prominent) */}
                 <Button
                     type="submit"
                     variant="danger"
@@ -335,10 +303,98 @@ const AddExpense = () => {
                     isLoading={loading}
                     icon={<Save size={20} />}
                     className="submit-btn"
-                    style={{ marginTop: '24px' }}
+                    style={{
+                        width: '100%',
+                        padding: '16px',
+                        fontSize: '1.1rem',
+                        boxShadow: '0 4px 12px rgba(239, 68, 68, 0.3)'
+                    }}
                 >
-                    {isEditMode ? 'AGGIORNA' : (items.length > 0 ? 'SALVA CARICO' : 'SALVA SPESA')}
+                    {isEditMode ? 'AGGIORNA SPESA' : (items.length > 0 ? 'SALVA CARICO' : 'SALVA SPESA')}
                 </Button>
+
+                {/* 5. INVENTORY (Collapsible/Optional) */}
+                <div className="inventory-section" style={{ marginTop: '30px', borderTop: '1px solid var(--border-color)', paddingTop: '20px' }}>
+                    <div
+                        onClick={() => setShowInventory(!showInventory)}
+                        style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px', cursor: 'pointer', opacity: 0.8 }}
+                    >
+                        <Box size={20} className="text-muted" />
+                        <h3 style={{ fontSize: '1rem', margin: 0 }}>
+                            {showInventory ? 'Nascondi Prodotti' : 'Aggiungi Prodotti da Magazzino...'}
+                        </h3>
+                    </div>
+
+                    {showInventory && (
+                        <div className="slide-down">
+                            <ProductSelector onSelect={handleAddItem} />
+
+                            {/* Items List */}
+                            {items.length > 0 ? (
+                                <div className="items-list" style={{ marginTop: '12px' }}>
+                                    {items.map(item => (
+                                        <div key={item.tempId} className="stock-item-row" style={{
+                                            background: 'var(--color-bg-secondary)',
+                                            padding: '12px',
+                                            borderRadius: '12px',
+                                            marginBottom: '8px',
+                                            border: '1px solid var(--border-color)',
+                                            animation: 'slideUp 0.2s ease'
+                                        }}>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                                                <span style={{ fontWeight: 'bold' }}>{item.product.name}</span>
+                                                <button type="button" onClick={() => removeItem(item.tempId)} style={{ color: 'var(--color-danger)', background: 'none', border: 'none' }}>
+                                                    <Trash2 size={18} />
+                                                </button>
+                                            </div>
+
+                                            <div className="stock-controls" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1.2fr', gap: '8px' }}>
+                                                <div>
+                                                    <label style={{ fontSize: '0.7rem', opacity: 0.7 }}>Qta</label>
+                                                    <input
+                                                        type="number"
+                                                        className="input-field"
+                                                        value={item.quantity}
+                                                        onChange={(e) => updateItem(item.tempId, 'quantity', parseFloat(e.target.value))}
+                                                        style={{ padding: '4px 8px', height: '36px' }}
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label style={{ fontSize: '0.7rem', opacity: 0.7 }}>Prezzo</label>
+                                                    <input
+                                                        type="number"
+                                                        className="input-field"
+                                                        value={item.unit_price}
+                                                        onChange={(e) => updateItem(item.tempId, 'unit_price', parseFloat(e.target.value))}
+                                                        style={{ padding: '4px 8px', height: '36px' }}
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label style={{ fontSize: '0.7rem', opacity: 0.7 }}>Destinazione</label>
+                                                    <select
+                                                        className="input-field"
+                                                        value={item.coop_id}
+                                                        onChange={(e) => updateItem(item.tempId, 'coop_id', e.target.value)}
+                                                        style={{ padding: '0 4px', fontSize: '0.8rem', height: '36px' }}
+                                                    >
+                                                        <option value="">Generale</option>
+                                                        {coops.map(c => (
+                                                            <option key={c.id} value={c.id}>{c.name}</option>
+                                                        ))}
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div style={{ padding: '20px', textAlign: 'center', opacity: 0.5, fontStyle: 'italic', fontSize: '0.9rem' }}>
+                                    Clicca o tocca un prodotto sopra per aggiungerlo.
+                                </div>
+                            )}
+                        </div>
+                    )}
+                </div>
             </form>
         </div>
     );
