@@ -84,17 +84,19 @@ const EggCollection = () => {
 
             <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px', maxWidth: '600px', margin: '0 auto' }}>
 
-                {/* DATA SELETTORE */}
+                {/* DATA SELETTORE COMPATTO */}
                 <div style={{
                     background: 'var(--color-bg-secondary)',
-                    padding: '16px',
-                    borderRadius: '16px',
+                    padding: '12px',
+                    borderRadius: '12px',
                     display: 'flex',
                     alignItems: 'center',
+                    justifyContent: 'center',
                     gap: '12px',
-                    border: '1px solid var(--border-color)'
+                    border: '1px solid var(--border-color)',
+                    marginBottom: '10px'
                 }}>
-                    <Calendar size={20} className="text-secondary" />
+                    <Calendar size={18} className="text-secondary" />
                     <input
                         type="date"
                         value={date}
@@ -102,69 +104,72 @@ const EggCollection = () => {
                         style={{
                             background: 'transparent',
                             border: 'none',
-                            fontSize: '1.1rem',
+                            fontSize: '1rem',
                             color: 'var(--color-text-primary)',
                             fontWeight: '600',
-                            flex: 1
+                            textAlign: 'center'
                         }}
                     />
                 </div>
 
-                {/* LISTA COLORI */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                {/* GRIGLIA COLORI 2x2 */}
+                <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: '1fr 1fr',
+                    gap: '12px'
+                }}>
                     {EGG_COLORS.map((color) => (
                         <div key={color.id} style={{
                             background: 'var(--color-bg-secondary)',
                             borderRadius: '16px',
-                            padding: '16px',
+                            padding: '12px',
                             border: '1px solid var(--border-color)',
                             display: 'flex',
+                            flexDirection: 'column',
                             alignItems: 'center',
-                            justifyContent: 'space-between'
+                            gap: '8px',
+                            textAlign: 'center'
                         }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                <div style={{
-                                    width: '40px',
-                                    height: '40px',
-                                    borderRadius: '50%',
-                                    background: color.hex,
-                                    border: '2px solid rgba(0,0,0,0.1)',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    fontSize: '1.2rem',
-                                    boxShadow: '0 2px 5px rgba(0,0,0,0.1)'
-                                }}>
-                                    {/* Icona visiva */}
-                                    {color.icon}
-                                </div>
-                                <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                    <span style={{ fontWeight: '700', fontSize: '1rem' }}>{color.label}</span>
-                                    <span style={{ fontSize: '0.8rem', opacity: 0.6 }}>Inserisci quantità</span>
-                                </div>
+                            <div style={{
+                                width: '32px',
+                                height: '32px',
+                                borderRadius: '50%',
+                                background: color.hex,
+                                border: '2px solid rgba(0,0,0,0.1)',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                fontSize: '1rem',
+                                boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                            }}>
+                                {color.icon}
                             </div>
 
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                <input
-                                    type="number"
-                                    inputMode="numeric"
-                                    pattern="[0-9]*"
-                                    placeholder="0"
-                                    value={counts[color.id]}
-                                    onChange={(e) => handleInputChange(color.id, e.target.value)}
-                                    style={{
-                                        width: '80px',
-                                        height: '50px',
-                                        fontSize: '1.5rem',
-                                        textAlign: 'center',
-                                        border: '2px solid var(--border-color)',
-                                        borderRadius: '12px',
-                                        background: 'var(--color-bg-primary)',
-                                        color: 'var(--color-text-primary)',
-                                        fontWeight: 'bold'
-                                    }}
-                                />
-                            </div>
+                            <span style={{ fontWeight: '600', fontSize: '0.9rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '100%' }}>
+                                {color.label.split(' ')[0]} {/* Mostra solo prima parola per spazio */}
+                            </span>
+
+                            <input
+                                type="number"
+                                inputMode="numeric"
+                                pattern="[0-9]*"
+                                placeholder="0"
+                                value={counts[color.id]}
+                                onChange={(e) => handleInputChange(color.id, e.target.value)}
+                                style={{
+                                    width: '100%',
+                                    height: '45px',
+                                    fontSize: '1.5rem',
+                                    textAlign: 'center',
+                                    border: '2px solid var(--border-color)',
+                                    borderRadius: '12px',
+                                    background: 'var(--color-bg-primary)',
+                                    color: 'var(--color-text-primary)',
+                                    fontWeight: 'bold',
+                                    outline: 'none'
+                                }}
+                                onFocus={(e) => e.target.select()} // Seleziona tutto al focus per edit rapido
+                            />
                         </div>
                     ))}
                 </div>
