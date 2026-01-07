@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowUpCircle, ArrowDownCircle, Trash2, Pencil } from 'lucide-react';
+import { ArrowUpCircle, ArrowDownCircle, Trash2, Pencil, AlertCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import './TransactionList.css';
