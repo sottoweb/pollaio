@@ -154,54 +154,68 @@ const ProductManager = ({ onClose, onSuccess, initialProduct = null }) => {
                     </div>
 
                     {/* Basic Info */}
-                    <div className="input-group">
-                        <Package size={20} className="input-icon" />
+                    {/* Basic Info */}
+                    <div>
+                        <label style={{ display: 'block', fontSize: '0.8rem', marginBottom: '4px', color: 'var(--color-text-secondary)' }}>
+                            Nome Prodotto
+                        </label>
                         <input
                             type="text"
-                            placeholder="Nome Prodotto (es. Mais)"
+                            placeholder="Es. Mais"
                             value={name}
                             onChange={e => setName(e.target.value)}
-                            // remove required as we validate manually
                             className="input-field"
+                            style={{ width: '100%', padding: '12px', fontSize: '1rem' }}
                         />
                     </div>
 
-                    <div style={{ display: 'flex', gap: '10px' }}>
-                        <div className="input-group" style={{ flex: 1 }}>
-                            <DollarSign size={20} className="input-icon" />
-                            <input
-                                type="number"
-                                placeholder="Prezzo Default"
-                                value={price}
-                                onChange={e => setPrice(e.target.value)}
-                                min="0"
-                                step="0.01"
-                                className="input-field"
-                            />
-                        </div>
-                        <div className="input-group" style={{ flex: 1 }}>
-                            <input
-                                type="number"
-                                placeholder="Priorità (0-100)"
-                                value={priority}
-                                onChange={e => setPriority(e.target.value)}
-                                min="0"
-                                step="1"
-                                className="input-field"
-                                title="Priorità di ordinamento (più alto = appare prima)"
-                            />
-                        </div>
+                    <div>
+                        <label style={{ display: 'block', fontSize: '0.8rem', marginBottom: '4px', color: 'var(--color-text-secondary)' }}>
+                            Prezzo €
+                        </label>
+                        <input
+                            type="number"
+                            placeholder="0.00"
+                            value={price}
+                            onChange={e => setPrice(e.target.value)}
+                            min="0"
+                            step="0.01"
+                            className="input-field"
+                            style={{ width: '100px', padding: '12px', fontSize: '1rem', textAlign: 'center' }}
+                        />
                     </div>
 
-                    <div className="input-group">
-                        <FileText size={20} className="input-icon" />
+                    <div>
+                        <label style={{ display: 'block', fontSize: '0.8rem', marginBottom: '4px', color: 'var(--color-text-secondary)' }}>
+                            Descrizione
+                        </label>
                         <textarea
-                            placeholder="Descrizione (opzionale)"
+                            placeholder="Opzionale"
                             value={description}
                             onChange={e => setDescription(e.target.value)}
                             className="input-field"
-                            style={{ minHeight: '80px', resize: 'vertical', paddingTop: '10px' }}
+                            style={{ width: '100%', minHeight: '80px', resize: 'vertical', padding: '12px', fontSize: '0.9rem' }}
                         />
+                    </div>
+
+                    <div>
+                        <label style={{ display: 'block', fontSize: '0.8rem', marginBottom: '4px', color: 'var(--color-text-secondary)' }}>
+                            Priorità (0-100)
+                        </label>
+                        <input
+                            type="number"
+                            placeholder="0"
+                            value={priority}
+                            onChange={e => setPriority(e.target.value)}
+                            min="0"
+                            max="999"
+                            step="1"
+                            className="input-field"
+                            style={{ width: '80px', padding: '12px', fontSize: '1rem', textAlign: 'center' }}
+                        />
+                        <div style={{ fontSize: '0.7rem', color: 'var(--color-text-secondary)', marginTop: '4px' }}>
+                            Più alto = appare prima in lista.
+                        </div>
                     </div>
 
                     <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
