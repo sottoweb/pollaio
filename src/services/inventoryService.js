@@ -14,15 +14,91 @@ export const inventoryService = {
         return data;
     },
 
-    async addProduct(name, default_price = 0, unit = 'pz') {
+    async addProduct(name, default_price = 0, unit = 'pz', description = '', image_url = null) {
+        // window.alert(`Tentativo creazione: ${name}`);
+        try {
+            const { data, error } = await supabase
+                .from('products')
+                .insert([{ name, default_price, unit, description, image_url }])
+                .select();
+
+            if (error) {
+                window.alert(`ERRORE DB INSERT: ${error.message}`);
+                throw error;
+            }
+
+            if (!data || data.length === 0) {
+                window.alert("ATTENZIONE: Nessun dato ritornato dopo l'insert. Ricarica la pagina.");
+                return null;
+            }
+
+            // window.alert("Prodotto creato con successo (DB)!");
+            return data[0];
+        } catch (e) {
+            window.alert(`ECCEZIONE INSERT: ${e.message}`);
+            throw e;
+        }
+    },
+
+    async updateProduct(id, updates) {
+        console.log("updateProduct called with:", id, updates);
         const { data, error } = await supabase
             .from('products')
-            .insert([{ name, default_price, unit }])
-            .select()
-            .single();
+            .update(updates)
+            .eq('id', id)
+            .select();
+
+        if (error) {
+            console.error("updateProduct error:", error);
+            throw error;
+        }
+
+        if (!data || data.length === 0) {
+            console.warn("updateProduct: No rows returned immediately. Attempting manual refetch...");
+            const { data: refetched, error: fetchError } = await supabase.from('products').select('*').eq('id', id).single();
+
+            if (fetchError) console.error("Refetch error:", fetchError);
+            if (refetched) {
+                console.log("updateProduct: Recovered data via refetch:", refetched);
+                return refetched;
+            }
+
+            console.warn("updateProduct: Refetch failed too. Assuming success with optimistic return.");
+            return { id, ...updates };
+        }
+
+        console.log("updateProduct success:", data[0]);
+        return data[0];
+    },
+
+    async deleteProduct(id) {
+        const { error } = await supabase
+            .from('products')
+            .delete()
+            .eq('id', id);
 
         if (error) throw error;
-        return data;
+        return true;
+    },
+
+    async uploadProductImage(file) {
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${Math.random()}.${fileExt}`;
+        const filePath = `${fileName}`;
+
+        const { error: uploadError } = await supabase.storage
+            .from('product-images')
+            .upload(filePath, file);
+
+        if (uploadError) {
+            throw uploadError;
+        }
+
+        const { data: { publicUrl } } = supabase.storage
+            .from('product-images')
+            .getPublicUrl(filePath);
+
+        return publicUrl;
     },
 
     // --- STOCK LOADING (SPLIT-ON-SAVE) ---

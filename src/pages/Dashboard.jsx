@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Minus, Filter, Calendar } from 'lucide-react';
+import { Plus, Minus, Filter, Calendar, LayoutDashboard, TrendingUp, AlertCircle, Package, ArrowUpRight, ArrowDownRight } from 'lucide-react';
 import { transactionService } from '../services/transactionService';
 import TransactionList from '../components/TransactionList';
 import StatsCard from '../components/StatsCard';
