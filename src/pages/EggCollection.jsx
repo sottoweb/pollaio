@@ -68,35 +68,24 @@ const EggCollection = () => {
     };
 
     return (
-        <div className="egg-collection-page">
+        <div className="egg-collection-page" style={{ padding: '10px 0' }}>
             <Toaster position="top-center" />
-            <div className="page-header" style={{ marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <button
-                    onClick={() => navigate('/')}
-                    style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '8px' }}
-                >
-                    <ArrowLeft size={24} color="var(--color-text-primary)" />
-                </button>
-                <h1 style={{ margin: 0, fontSize: '1.5rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    Registra Raccolta 🧺
-                </h1>
-            </div>
 
-            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px', maxWidth: '600px', margin: '0 auto' }}>
+            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxWidth: '600px', margin: '0 auto' }}>
 
                 {/* DATA SELETTORE COMPATTO */}
                 <div style={{
                     background: 'var(--color-bg-secondary)',
-                    padding: '12px',
+                    padding: '8px',
                     borderRadius: '12px',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    gap: '12px',
+                    gap: '8px',
                     border: '1px solid var(--border-color)',
-                    marginBottom: '10px'
+                    marginBottom: '4px'
                 }}>
-                    <Calendar size={18} className="text-secondary" />
+                    <Calendar size={16} className="text-secondary" />
                     <input
                         type="date"
                         value={date}
@@ -104,10 +93,11 @@ const EggCollection = () => {
                         style={{
                             background: 'transparent',
                             border: 'none',
-                            fontSize: '1rem',
+                            fontSize: '0.9rem',
                             color: 'var(--color-text-primary)',
                             fontWeight: '600',
-                            textAlign: 'center'
+                            textAlign: 'center',
+                            padding: 0
                         }}
                     />
                 </div>
@@ -116,34 +106,34 @@ const EggCollection = () => {
                 <div style={{
                     display: 'grid',
                     gridTemplateColumns: '1fr 1fr',
-                    gap: '12px'
+                    gap: '8px'
                 }}>
                     {EGG_COLORS.map((color) => (
                         <div key={color.id} style={{
                             position: 'relative',
-                            height: '60px', // Altezza fissa contenuta
+                            height: '50px', // Altezza ridotta
                         }}>
-                            {/* Uovo visuale all'interno (Background style) */}
+                            {/* Uovo visuale all'interno */}
                             <div style={{
                                 position: 'absolute',
-                                left: '12px',
+                                left: '10px',
                                 top: '50%',
                                 transform: 'translateY(-50%)',
-                                width: '24px',
-                                height: '32px',
+                                width: '22px', // Leggermente più piccolo
+                                height: '28px',
                                 backgroundColor: color.hex,
-                                borderRadius: '50% 50% 50% 50% / 60% 60% 40% 40%', // Forma uovo
+                                borderRadius: '50% 50% 50% 50% / 60% 60% 40% 40%',
                                 border: '1px solid rgba(0,0,0,0.1)',
                                 zIndex: 1,
-                                boxShadow: 'inset -2px -2px 4px rgba(0,0,0,0.1)' // Effetto volume leggero
+                                boxShadow: 'inset -2px -2px 4px rgba(0,0,0,0.1)'
                             }}></div>
 
-                            {/* Label piccola dentro l'input in alto a destra */}
+                            {/* Label piccola */}
                             <span style={{
                                 position: 'absolute',
-                                right: '12px',
-                                top: '4px',
-                                fontSize: '0.7rem',
+                                right: '10px',
+                                top: '3px',
+                                fontSize: '0.65rem',
                                 fontWeight: '600',
                                 color: 'var(--color-text-secondary)',
                                 zIndex: 1,
@@ -162,18 +152,18 @@ const EggCollection = () => {
                                 style={{
                                     width: '100%',
                                     height: '100%',
-                                    fontSize: '1.5rem',
-                                    textAlign: 'right', // Numeri a destra per non coprire l'uovo
+                                    fontSize: '1.4rem',
+                                    textAlign: 'right',
                                     paddingRight: '12px',
-                                    paddingLeft: '50px', // Spazio per l'uovo
-                                    paddingTop: '12px', // Spazio per la label
+                                    paddingLeft: '40px', // Meno padding
+                                    paddingTop: '10px',
                                     border: '1px solid var(--border-color)',
-                                    borderRadius: '16px',
+                                    borderRadius: '12px', // Meno raggio
                                     background: 'var(--color-bg-secondary)',
                                     color: 'var(--color-text-primary)',
                                     fontWeight: 'bold',
                                     outline: 'none',
-                                    boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
+                                    boxShadow: 'none' // Rimuovo shadow per pulizia
                                 }}
                                 onFocus={(e) => e.target.select()}
                             />
