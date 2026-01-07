@@ -12,11 +12,24 @@ const Input = ({ label, error, className = '', id, ...props }) => {
                     {label}
                 </label>
             )}
-            <input
-                id={inputId}
-                className={`input-field ${error ? 'input-error' : ''}`}
-                {...props}
-            />
+            {props.icon ? (
+                <div className="input-wrapper">
+                    <div className="input-icon">
+                        {props.icon}
+                    </div>
+                    <input
+                        id={inputId}
+                        className={`input-field input-field-with-icon ${error ? 'input-error' : ''}`}
+                        {...props}
+                    />
+                </div>
+            ) : (
+                <input
+                    id={inputId}
+                    className={`input-field ${error ? 'input-error' : ''}`}
+                    {...props}
+                />
+            )}
             {error && <span className="input-error-message">{error}</span>}
         </div>
     );

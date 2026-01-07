@@ -115,6 +115,7 @@ const AddIncome = () => {
                         required
                         autoFocus={!isEditMode}
                         style={{ fontSize: '1.2rem', fontWeight: 'bold' }} // Make amount prominent
+                        icon={<span className="text-success" style={{ fontWeight: 'bold', fontSize: '1.2rem' }}>€</span>}
                     />
                     <Input
                         label="Data"
@@ -127,7 +128,7 @@ const AddIncome = () => {
                 </div>
 
                 {/* ROW 2: Numero Uova + Cliente */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: '12px', alignItems: 'start' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '0.6fr 1.5fr', gap: '12px', alignItems: 'start' }}>
                     <Input
                         label="N. Uova"
                         type="number"
@@ -135,6 +136,7 @@ const AddIncome = () => {
                         value={formData.eggs_count}
                         onChange={handleChange}
                         placeholder="0"
+                        icon={<span style={{ fontSize: '1.2rem' }}>🥚</span>}
                     />
                     {/* CRM Selector wrapper to fit height */}
                     <div style={{ marginTop: '0' }}>
@@ -183,8 +185,8 @@ const AddIncome = () => {
                                 padding: '6px 12px',
                                 borderRadius: '6px',
                                 border: 'none',
-                                background: !formData.is_paid ? 'var(--color-warning)' : 'transparent', // Yellow warning for NO
-                                color: !formData.is_paid ? 'black' : 'var(--color-text-secondary)',
+                                background: !formData.is_paid ? '#EF4444' : 'transparent', // Red for NO
+                                color: !formData.is_paid ? 'white' : 'var(--color-text-secondary)',
                                 fontWeight: !formData.is_paid ? 600 : 400,
                                 cursor: 'pointer',
                                 transition: 'all 0.2s'
