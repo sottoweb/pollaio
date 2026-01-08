@@ -450,14 +450,15 @@ const EggCollection = () => {
                         const timeStr = `${new Date(record.recorded_at).toLocaleDateString(undefined, { day: 'numeric', month: 'short' })} - ${new Date(record.recorded_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
 
                         return (
-                            <StatCard
-                                key={record.id}
-                                title={record.coop_name}
-                                subtitle={timeStr}
-                                total={record.total_quantity}
-                                byColor={byColor}
-                                isHistory={true}
-                            />
+                            <div key={record.id} onClick={() => navigate(`/production/edit/${record.id}`)} style={{ cursor: 'pointer' }}>
+                                <StatCard
+                                    title={record.coop_name}
+                                    subtitle={timeStr}
+                                    total={record.total_quantity}
+                                    byColor={byColor}
+                                    isHistory={true}
+                                />
+                            </div>
                         );
                     })}
                     {history.length === 0 && <p style={{ textAlign: 'center', opacity: 0.5 }}>Nessuna raccolta recente</p>}

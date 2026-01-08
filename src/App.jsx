@@ -13,6 +13,7 @@ import Dashboard from './pages/Dashboard';
 import AddIncome from './pages/AddIncome';
 import AddExpense from './pages/AddExpense';
 import EggCollection from './pages/EggCollection';
+import EditCollection from './pages/EditCollection';
 import AdvancedStats from './pages/AdvancedStats';
 import CoopsList from './pages/CoopsList';
 import CoopDetails from './pages/CoopDetails';
@@ -48,6 +49,7 @@ function App() {
           <Route path="/edit-expense/:id" element={<ProtectedRoute><AddExpense /></ProtectedRoute>} />
           <Route path="/stats" element={<ProtectedRoute><AdvancedStats /></ProtectedRoute>} />
           <Route path="/production" element={<ProtectedRoute><EggCollection /></ProtectedRoute>} />
+          <Route path="/production/edit/:sessionId" element={<ProtectedRoute><EditCollection /></ProtectedRoute>} />
 
           {/* Protected Routes V3.0 - Pollai */}
           <Route path="/coops" element={<ProtectedRoute><CoopsList /></ProtectedRoute>} />

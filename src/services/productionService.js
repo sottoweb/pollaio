@@ -103,5 +103,59 @@ export const productionService = {
 
         if (error) throw error;
         return data;
+    },
+
+    // Recupera dettagli di una sessione specifica per l'edit
+    async getCollectionBySessionId(sessionId) {
+        const { data, error } = await supabase
+            .from('egg_production')
+            .select(`*, coops(name)`)
+            .eq('session_id', sessionId);
+
+        if (error) throw error;
+        return data;
+    },
+
+    // Elimina intera sessione
+    async deleteCollection(sessionId) {
+        const { error } = await supabase
+            .from('egg_production')
+            .delete()
+            .eq('session_id', sessionId);
+
+        if (error) throw error;
+    },
+
+    // Aggiorna sessione
+    async updateCollection(sessionId, collectionData) {
+        // collectionData: { date, items, coopId, originalRecordedAt }
+
+        // 1. Delete old rows
+        const { error: delError } = await supabase
+            .from('egg_production')
+            .delete()
+            .eq('session_id', sessionId);
+
+        if (delError) throw delError;
+
+        // 2. Insert new rows with SAME session_id
+        const rows = collectionData.items
+            .filter(item => item.quantity > 0)
+            .map(item => ({
+                date: collectionData.date,
+                color: item.color,
+                quantity: parseInt(item.quantity),
+                coop_id: collectionData.coopId || null,
+                session_id: sessionId, // PRESERVE ID
+                recorded_at: collectionData.originalRecordedAt || new Date().toISOString()
+            }));
+
+        if (rows.length > 0) {
+            const { error: insError } = await supabase
+                .from('egg_production')
+                .insert(rows);
+
+            if (insError) throw insError;
+        }
     }
 };
