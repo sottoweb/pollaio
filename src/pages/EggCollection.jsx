@@ -354,7 +354,7 @@ const EggCollection = () => {
                     {EGG_COLORS.map((color) => (
                         <div key={color.id} style={{
                             position: 'relative',
-                            height: '50px',
+                            height: '60px', // INCREASED HEIGHT
                         }}>
                             {/* Tasto Uovo Interattivo - UX Magic */}
                             <button
@@ -362,25 +362,25 @@ const EggCollection = () => {
                                 onClick={() => handleIncrement(color.id)}
                                 style={{
                                     position: 'absolute',
-                                    left: '10px',
+                                    left: '12px', // Adjusted left
                                     top: '50%',
                                     transform: 'translateY(-50%)',
                                     background: 'none',
                                     border: 'none',
                                     padding: 0,
                                     cursor: 'pointer',
-                                    zIndex: 10, // Ensure it's above input
+                                    zIndex: 10,
                                     outline: 'none',
                                     transition: 'transform 0.1s'
                                 }}
                             >
                                 <div style={{
-                                    width: '24px',
-                                    height: '30px',
+                                    width: '30px', // INCREASED SIZE
+                                    height: '38px', // INCREASED SIZE
                                     backgroundColor: color.hex,
                                     borderRadius: '50% 50% 50% 50% / 60% 60% 40% 40%',
                                     border: '1px solid rgba(0,0,0,0.1)',
-                                    boxShadow: 'inset -2px -2px 4px rgba(0,0,0,0.1), 0 2px 5px rgba(0,0,0,0.15)', // Enhanced shadow
+                                    boxShadow: 'inset -2px -2px 4px rgba(0,0,0,0.1), 0 2px 5px rgba(0,0,0,0.15)',
                                     transition: 'transform 0.1s'
                                 }}
                                     onMouseDown={(e) => e.currentTarget.style.transform = 'scale(0.9)'}
@@ -393,9 +393,9 @@ const EggCollection = () => {
 
                             <span style={{
                                 position: 'absolute',
-                                right: '10px',
-                                top: '3px',
-                                fontSize: '0.65rem',
+                                right: '12px',
+                                top: '4px',
+                                fontSize: '0.75rem',
                                 fontWeight: '600',
                                 color: 'var(--color-text-secondary)',
                                 zIndex: 1,
@@ -414,13 +414,13 @@ const EggCollection = () => {
                                 style={{
                                     width: '100%',
                                     height: '100%',
-                                    fontSize: '1.4rem',
+                                    fontSize: '1.8rem', // INCREASED FONT
                                     textAlign: 'right',
                                     paddingRight: '12px',
-                                    paddingLeft: '40px',
-                                    paddingTop: '10px',
+                                    paddingLeft: '55px', // INCREASED PADDING
+                                    paddingTop: '12px',
                                     border: '1px solid var(--border-color)',
-                                    borderRadius: '12px',
+                                    borderRadius: '16px',
                                     background: 'var(--color-bg-secondary)',
                                     color: 'var(--color-text-primary)',
                                     fontWeight: 'bold',

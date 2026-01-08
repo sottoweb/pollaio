@@ -262,7 +262,7 @@ const EditCollection = () => {
                         {EGG_COLORS.map((color) => (
                             <div key={color.id} style={{
                                 position: 'relative',
-                                height: '50px',
+                                height: '60px', // INCREASED HEIGHT
                             }}>
                                 {/* UX Magic Button */}
                                 <button
@@ -270,7 +270,7 @@ const EditCollection = () => {
                                     onClick={() => handleIncrement(color.id)}
                                     style={{
                                         position: 'absolute',
-                                        left: '10px',
+                                        left: '12px', // ADJUSTED
                                         top: '50%',
                                         transform: 'translateY(-50%)',
                                         background: 'none',
@@ -283,8 +283,8 @@ const EditCollection = () => {
                                     }}
                                 >
                                     <div style={{
-                                        width: '24px',
-                                        height: '30px',
+                                        width: '30px', // INCREASED
+                                        height: '38px', // INCREASED
                                         backgroundColor: color.hex,
                                         borderRadius: '50% 50% 50% 50% / 60% 60% 40% 40%',
                                         border: '1px solid rgba(0,0,0,0.1)',
@@ -301,9 +301,9 @@ const EditCollection = () => {
 
                                 <span style={{
                                     position: 'absolute',
-                                    right: '10px',
-                                    top: '3px',
-                                    fontSize: '0.65rem',
+                                    right: '12px',
+                                    top: '4px',
+                                    fontSize: '0.75rem',
                                     fontWeight: '600',
                                     color: 'var(--color-text-secondary)',
                                     zIndex: 1,
@@ -322,13 +322,13 @@ const EditCollection = () => {
                                     style={{
                                         width: '100%',
                                         height: '100%',
-                                        fontSize: '1.4rem',
+                                        fontSize: '1.8rem', // INCREASED
                                         textAlign: 'right',
                                         paddingRight: '12px',
-                                        paddingLeft: '40px',
-                                        paddingTop: '10px',
+                                        paddingLeft: '55px', // INCREASED
+                                        paddingTop: '12px',
                                         border: '1px solid var(--border-color)',
-                                        borderRadius: '12px',
+                                        borderRadius: '16px',
                                         background: 'var(--color-bg-secondary)',
                                         color: 'var(--color-text-primary)',
                                         fontWeight: 'bold',
