@@ -150,6 +150,19 @@ const EggCollection = () => {
         }));
     };
 
+    const handleIncrement = (colorId) => {
+        // UX Magic: Haptic Feedback
+        if (navigator.vibrate) navigator.vibrate(40);
+
+        setCounts(prev => {
+            const currentVal = prev[colorId] === '' ? 0 : parseInt(prev[colorId]);
+            return {
+                ...prev,
+                [colorId]: currentVal + 1
+            };
+        });
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -332,7 +345,7 @@ const EggCollection = () => {
                     </div>
                 </div>
 
-                {/* GRIGLIA COLORI 2x2 COMPATTA (Codice invariato, solo referenziato) */}
+                {/* GRIGLIA COLORI 2x2 COMPATTA */}
                 <div style={{
                     display: 'grid',
                     gridTemplateColumns: '1fr 1fr',
@@ -343,19 +356,40 @@ const EggCollection = () => {
                             position: 'relative',
                             height: '50px',
                         }}>
-                            <div style={{
-                                position: 'absolute',
-                                left: '10px',
-                                top: '50%',
-                                transform: 'translateY(-50%)',
-                                width: '22px',
-                                height: '28px',
-                                backgroundColor: color.hex,
-                                borderRadius: '50% 50% 50% 50% / 60% 60% 40% 40%',
-                                border: '1px solid rgba(0,0,0,0.1)',
-                                zIndex: 1,
-                                boxShadow: 'inset -2px -2px 4px rgba(0,0,0,0.1)'
-                            }}></div>
+                            {/* Tasto Uovo Interattivo - UX Magic */}
+                            <button
+                                type="button"
+                                onClick={() => handleIncrement(color.id)}
+                                style={{
+                                    position: 'absolute',
+                                    left: '10px',
+                                    top: '50%',
+                                    transform: 'translateY(-50%)',
+                                    background: 'none',
+                                    border: 'none',
+                                    padding: 0,
+                                    cursor: 'pointer',
+                                    zIndex: 10, // Ensure it's above input
+                                    outline: 'none',
+                                    transition: 'transform 0.1s'
+                                }}
+                            >
+                                <div style={{
+                                    width: '24px',
+                                    height: '30px',
+                                    backgroundColor: color.hex,
+                                    borderRadius: '50% 50% 50% 50% / 60% 60% 40% 40%',
+                                    border: '1px solid rgba(0,0,0,0.1)',
+                                    boxShadow: 'inset -2px -2px 4px rgba(0,0,0,0.1), 0 2px 5px rgba(0,0,0,0.15)', // Enhanced shadow
+                                    transition: 'transform 0.1s'
+                                }}
+                                    onMouseDown={(e) => e.currentTarget.style.transform = 'scale(0.9)'}
+                                    onMouseUp={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                                    onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                                    onTouchStart={(e) => e.currentTarget.style.transform = 'scale(0.9)'}
+                                    onTouchEnd={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                                ></div>
+                            </button>
 
                             <span style={{
                                 position: 'absolute',
@@ -388,7 +422,7 @@ const EggCollection = () => {
                                     border: '1px solid var(--border-color)',
                                     borderRadius: '12px',
                                     background: 'var(--color-bg-secondary)',
-                                    color: 'var(--color-text-primary)', // Assicura contrasto
+                                    color: 'var(--color-text-primary)',
                                     fontWeight: 'bold',
                                     outline: 'none',
                                     boxShadow: 'none'

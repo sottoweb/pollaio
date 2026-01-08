@@ -33,20 +33,16 @@ const EditCollection = () => {
     useEffect(() => {
         const loadData = async () => {
             try {
-                // 1. Load Coops
                 const coopsData = await coopService.getCoops();
                 setCoops(coopsData || []);
 
-                // 2. Load Collection Data
                 if (sessionId) {
                     const rows = await productionService.getCollectionBySessionId(sessionId);
                     if (rows && rows.length > 0) {
-                        // Set basic info from first row
                         setDate(rows[0].date);
                         setSelectedCoop(rows[0].coop_id || '');
                         setOriginalRecordedAt(rows[0].recorded_at);
 
-                        // Map quantities
                         const newCounts = {
                             'ROSA': '',
                             'BIANCO': '',
@@ -80,6 +76,19 @@ const EditCollection = () => {
             ...prev,
             [colorId]: value === '' ? '' : parseInt(value) || 0
         }));
+    };
+
+    const handleIncrement = (colorId) => {
+        // UX Magic: Haptic Feedback
+        if (navigator.vibrate) navigator.vibrate(40);
+
+        setCounts(prev => {
+            const currentVal = prev[colorId] === '' ? 0 : parseInt(prev[colorId]);
+            return {
+                ...prev,
+                [colorId]: currentVal + 1
+            };
+        });
     };
 
     const handleDelete = async () => {
@@ -164,7 +173,7 @@ const EditCollection = () => {
                         onClick={handleDelete}
                         disabled={isDeleting}
                         style={{
-                            background: 'rgba(239, 68, 68, 0.1)', // Red tint
+                            background: 'rgba(239, 68, 68, 0.1)',
                             border: '1px solid rgba(239, 68, 68, 0.3)',
                             color: '#EF4444',
                             padding: '8px',
@@ -255,19 +264,40 @@ const EditCollection = () => {
                                 position: 'relative',
                                 height: '50px',
                             }}>
-                                <div style={{
-                                    position: 'absolute',
-                                    left: '10px',
-                                    top: '50%',
-                                    transform: 'translateY(-50%)',
-                                    width: '22px',
-                                    height: '28px',
-                                    backgroundColor: color.hex,
-                                    borderRadius: '50% 50% 50% 50% / 60% 60% 40% 40%',
-                                    border: '1px solid rgba(0,0,0,0.1)',
-                                    zIndex: 1,
-                                    boxShadow: 'inset -2px -2px 4px rgba(0,0,0,0.1)'
-                                }}></div>
+                                {/* UX Magic Button */}
+                                <button
+                                    type="button"
+                                    onClick={() => handleIncrement(color.id)}
+                                    style={{
+                                        position: 'absolute',
+                                        left: '10px',
+                                        top: '50%',
+                                        transform: 'translateY(-50%)',
+                                        background: 'none',
+                                        border: 'none',
+                                        padding: 0,
+                                        cursor: 'pointer',
+                                        zIndex: 10,
+                                        outline: 'none',
+                                        transition: 'transform 0.1s'
+                                    }}
+                                >
+                                    <div style={{
+                                        width: '24px',
+                                        height: '30px',
+                                        backgroundColor: color.hex,
+                                        borderRadius: '50% 50% 50% 50% / 60% 60% 40% 40%',
+                                        border: '1px solid rgba(0,0,0,0.1)',
+                                        boxShadow: 'inset -2px -2px 4px rgba(0,0,0,0.1), 0 2px 5px rgba(0,0,0,0.15)',
+                                        transition: 'transform 0.1s'
+                                    }}
+                                        onMouseDown={(e) => e.currentTarget.style.transform = 'scale(0.9)'}
+                                        onMouseUp={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                                        onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                                        onTouchStart={(e) => e.currentTarget.style.transform = 'scale(0.9)'}
+                                        onTouchEnd={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                                    ></div>
+                                </button>
 
                                 <span style={{
                                     position: 'absolute',
@@ -317,7 +347,7 @@ const EditCollection = () => {
                         disabled={isSaving}
                         style={{
                             marginTop: '20px',
-                            background: 'linear-gradient(135deg, #3B82F6 0%, #2563EB 100%)', // Blue for Edit
+                            background: 'linear-gradient(135deg, #3B82F6 0%, #2563EB 100%)',
                             color: 'white',
                             border: 'none',
                             padding: '16px',
