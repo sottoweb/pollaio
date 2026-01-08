@@ -99,19 +99,53 @@
     box-shadow: 0 8px 20px rgba(239, 68, 68, 0.4);
 }
 
-.list-section h3 {
+/* LIST & PRODUCTION SECTIONS COMMON STYLES */
+.list-section h3,
+.production-section h3 {
     margin-bottom: var(--spacing-md);
     font-size: var(--font-size-lg);
     color: var(--color-text-secondary);
 }
 
+.production-section {
+    margin-top: var(--spacing-xl);
+}
+
 @media (max-width: 640px) {
+    .dashboard {
+        gap: 12px;
+        /* Ridotto drasticamente */
+    }
+
+    .dashboard-header h2 {
+        font-size: 1.25rem;
+    }
+
+    .filter-select {
+        font-size: 0.8rem;
+        padding: 0.3rem 2rem 0.3rem 0.7rem;
+    }
+
     .stats-grid {
         grid-template-columns: 1fr 1fr;
-        gap: 10px;
+        gap: 8px;
+        /* Compact */
+    }
+
+    /* List & Production Headers Compact */
+    .list-section h3,
+    .production-section h3 {
+        margin-bottom: 8px;
+        font-size: 1rem;
+        margin-top: 4px;
+    }
+
+    .production-section {
+        margin-top: 12px;
     }
 
     .action-buttons {
         grid-template-columns: 1fr;
+        gap: 10px;
     }
 }

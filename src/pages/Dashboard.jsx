@@ -177,7 +177,7 @@ const Dashboard = () => {
                 />
             </div>
 
-            <div className="production-section" style={{ marginTop: '24px' }}>
+            <div className="production-section">
                 <h3>Produzione Uova (Statistiche)</h3>
                 <EggProductionWidget />
             </div>
