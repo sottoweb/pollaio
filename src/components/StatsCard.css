@@ -119,53 +119,66 @@
     border: 2px solid currentColor;
 }
 
-/* COMPACT MOBILE VIEW */
+/* MOBILE OPTIMIZED VIEW (2 Columns Grid in Dashboard) */
 @media (max-width: 640px) {
     .stats-card {
-        padding: 8px 10px;
-        /* Reduced vertical padding */
-        min-height: auto;
-        gap: 6px;
-    }
-
-    .stats-title {
-        font-size: 0.65rem;
-        /* Smaller title */
-        margin-bottom: 0;
-        letter-spacing: 0;
-        opacity: 0.9;
-    }
-
-    .stats-value {
-        font-size: 1rem;
-        /* Smaller value */
-        line-height: 1.1;
+        padding: 12px;
+        /* Balanced padding */
+        min-height: 80px;
+        /* Ensure decent height for touch targets */
+        flex-direction: column;
+        /* Stack content and icon vertically OR keep horizontal but compact? */
+        /* Let's keep horizontal for now but optimized */
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
     }
 
     .stats-content {
-        gap: 0px;
+        gap: 2px;
+        flex: 1;
+        min-width: 0;
+        /* Prevents overflow */
+    }
+
+    .stats-title {
+        font-size: 0.75rem;
+        /* Readable size */
+        margin-bottom: 2px;
+        letter-spacing: 0.02em;
+        opacity: 0.8;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .stats-value {
+        font-size: 1.25rem;
+        /* Good size for numbers */
+        line-height: 1.2;
     }
 
     .stats-icon-wrapper {
-        width: 28px;
-        /* Smaller icon wrapper */
-        height: 28px;
-        border-radius: 6px;
+        width: 36px;
+        /* Slightly smaller than desktop but clear */
+        height: 36px;
+        border-radius: 10px;
+        flex-shrink: 0;
     }
 
-    /* Resize SVG/Emoji inside */
     .stats-icon-wrapper svg,
     .stats-icon-wrapper .emoji-icon {
-        width: 16px !important;
-        height: 16px !important;
-        font-size: 16px !important;
+        width: 20px !important;
+        height: 20px !important;
+        font-size: 20px !important;
     }
 
     .add-indicator {
-        width: 12px;
-        height: 12px;
-        font-size: 10px;
-        bottom: -3px;
-        right: -3px;
+        width: 14px;
+        height: 14px;
+        font-size: 12px;
+        bottom: -4px;
+        right: -4px;
     }
 }
