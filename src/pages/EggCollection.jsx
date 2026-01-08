@@ -354,29 +354,31 @@ const EggCollection = () => {
                     {EGG_COLORS.map((color) => (
                         <div key={color.id} style={{
                             position: 'relative',
-                            height: '60px', // INCREASED HEIGHT
+                            height: '60px',
                         }}>
-                            {/* Tasto Uovo Interattivo - UX Magic */}
+                            {/* Tasto Uovo Interattivo - Area Cliccabile Espansa */}
                             <button
                                 type="button"
                                 onClick={() => handleIncrement(color.id)}
                                 style={{
                                     position: 'absolute',
-                                    left: '12px', // Adjusted left
-                                    top: '50%',
-                                    transform: 'translateY(-50%)',
-                                    background: 'none',
+                                    left: '0',
+                                    top: '0',
+                                    bottom: '0',
+                                    width: '80px', // PROTEZIONE WIDE
+                                    background: 'transparent',
                                     border: 'none',
-                                    padding: 0,
+                                    padding: '0 0 0 12px', // Centra visivamente l'icona
                                     cursor: 'pointer',
-                                    zIndex: 10,
-                                    outline: 'none',
-                                    transition: 'transform 0.1s'
+                                    zIndex: 20, // Domina sull'input
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    outline: 'none'
                                 }}
                             >
                                 <div style={{
-                                    width: '30px', // INCREASED SIZE
-                                    height: '38px', // INCREASED SIZE
+                                    width: '30px',
+                                    height: '38px',
                                     backgroundColor: color.hex,
                                     borderRadius: '50% 50% 50% 50% / 60% 60% 40% 40%',
                                     border: '1px solid rgba(0,0,0,0.1)',
@@ -414,10 +416,10 @@ const EggCollection = () => {
                                 style={{
                                     width: '100%',
                                     height: '100%',
-                                    fontSize: '1.8rem', // INCREASED FONT
+                                    fontSize: '1.8rem',
                                     textAlign: 'right',
                                     paddingRight: '12px',
-                                    paddingLeft: '55px', // INCREASED PADDING
+                                    paddingLeft: '85px', // Zona Cuscinetto
                                     paddingTop: '12px',
                                     border: '1px solid var(--border-color)',
                                     borderRadius: '16px',
