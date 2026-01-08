@@ -75,13 +75,24 @@ const EggCollection = () => {
 
     const calculateStats = (data) => {
         const now = new Date();
-        const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-        const day = now.getDay() || 7;
-        const startOfWeek = new Date(startOfDay);
-        if (day !== 1) startOfWeek.setHours(-24 * (day - 1));
 
-        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-        const startOfYear = new Date(now.getFullYear(), 0, 1);
+        // Helper per ottenere YYYY-MM-DD locale corrente
+        const toYMD = (d) => {
+            const year = d.getFullYear();
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        };
+
+        const todayStr = toYMD(now);
+        const currentYear = now.getFullYear();
+        const currentMonth = now.getMonth(); // 0-indexed
+
+        // Calcolo inizio settimana (Lunedi)
+        const dayOfWeek = now.getDay() || 7; // 1=Lun, 7=Dom
+        const startOfWeek = new Date(now);
+        startOfWeek.setDate(now.getDate() - dayOfWeek + 1);
+        startOfWeek.setHours(0, 0, 0, 0);
 
         const newStats = {
             today: { total: 0, byColor: {} },
@@ -91,29 +102,32 @@ const EggCollection = () => {
         };
 
         data.forEach(item => {
-            const itemDate = new Date(item.date);
-            const qty = item.quantity;
-            const color = item.color;
+            if (!item.date) return;
 
-            // Helper to update stat object
+            const qty = parseInt(item.quantity) || 0;
+            const color = item.color;
+            const rowDateStr = item.date.split('T')[0]; // YYYY-MM-DD sicura dal DB
+
+            // Parsing manuale per evitare interpretazioni UTC del browser
+            const [y, m, d] = rowDateStr.split('-').map(Number);
+            const rowDateObj = new Date(y, m - 1, d); // Data locale alle 00:00
+
             const update = (statKey) => {
                 newStats[statKey].total += qty;
                 newStats[statKey].byColor[color] = (newStats[statKey].byColor[color] || 0) + qty;
             };
 
-            // Year (sempre se è nel dataset filtrato per anno)
-            update('year');
+            // Today
+            if (rowDateStr === todayStr) update('today');
+
+            // Week (Confronto timestamp per sicurezza, rowDateObj è inizio giornata)
+            if (rowDateObj >= startOfWeek) update('week');
 
             // Month
-            if (itemDate >= startOfMonth) update('month');
+            if (y === currentYear && (m - 1) === currentMonth) update('month');
 
-            // Week
-            // Reset hours for accurate comparison
-            const d = new Date(itemDate.getFullYear(), itemDate.getMonth(), itemDate.getDate());
-            if (d >= startOfWeek) update('week');
-
-            // Today
-            if (d.getTime() === startOfDay.getTime()) update('today');
+            // Year
+            if (y === currentYear) update('year');
         });
 
         setStatsData(newStats);
