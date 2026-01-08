@@ -34,8 +34,7 @@ const Layout = ({ children }) => {
             <header className="app-header">
                 <div className="header-content">
                     <Link to="/" className="logo d-flex align-items-center gap-2" style={{ textDecoration: 'none', color: 'inherit' }}>
-                        <Egg className="icon-gold" size={32} />
-                        <h1>Uova 2.0</h1>
+                        <Egg className="icon-gold" size={40} />
                     </Link>
                     <div className="header-actions">
                         <NavLink to="/production" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
