@@ -21,6 +21,12 @@ const EggCollection = () => {
         'VERDE': '',
         'CIOCCOLATO': ''
     });
+    const [statsData, setStatsData] = useState({
+        today: { total: 0, byColor: {} },
+        week: { total: 0, byColor: {} },
+        month: { total: 0, byColor: {} },
+        year: { total: 0, byColor: {} }
+    });
     const [coops, setCoops] = useState([]);
     const [selectedCoop, setSelectedCoop] = useState('');
     const [history, setHistory] = useState([]);
@@ -29,6 +35,7 @@ const EggCollection = () => {
     useEffect(() => {
         loadCoops();
         loadHistory();
+        loadStats();
     }, []);
 
     const loadCoops = async () => {
@@ -45,11 +52,71 @@ const EggCollection = () => {
 
     const loadHistory = async () => {
         try {
-            const data = await productionService.getRecentCollections();
+            const data = await productionService.getRecentCollections(15);
             setHistory(data || []);
         } catch (error) {
             console.error("Failed to load history", error);
         }
+    };
+
+    const loadStats = async () => {
+        try {
+            // Carica dati dall'inizio dell'anno per le stats
+            const now = new Date();
+            const startOfYear = `${now.getFullYear()}-01-01`;
+            const endOfYear = `${now.getFullYear()}-12-31`;
+            const data = await productionService.getProductionStats(startOfYear, endOfYear);
+
+            calculateStats(data || []);
+        } catch (error) {
+            console.error("Failed to load stats", error);
+        }
+    };
+
+    const calculateStats = (data) => {
+        const now = new Date();
+        const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const day = now.getDay() || 7;
+        const startOfWeek = new Date(startOfDay);
+        if (day !== 1) startOfWeek.setHours(-24 * (day - 1));
+
+        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+        const startOfYear = new Date(now.getFullYear(), 0, 1);
+
+        const newStats = {
+            today: { total: 0, byColor: {} },
+            week: { total: 0, byColor: {} },
+            month: { total: 0, byColor: {} },
+            year: { total: 0, byColor: {} }
+        };
+
+        data.forEach(item => {
+            const itemDate = new Date(item.date);
+            const qty = item.quantity;
+            const color = item.color;
+
+            // Helper to update stat object
+            const update = (statKey) => {
+                newStats[statKey].total += qty;
+                newStats[statKey].byColor[color] = (newStats[statKey].byColor[color] || 0) + qty;
+            };
+
+            // Year (sempre se è nel dataset filtrato per anno)
+            update('year');
+
+            // Month
+            if (itemDate >= startOfMonth) update('month');
+
+            // Week
+            // Reset hours for accurate comparison
+            const d = new Date(itemDate.getFullYear(), itemDate.getMonth(), itemDate.getDate());
+            if (d >= startOfWeek) update('week');
+
+            // Today
+            if (d.getTime() === startOfDay.getTime()) update('today');
+        });
+
+        setStatsData(newStats);
     };
 
     const handleInputChange = (colorId, value) => {
@@ -108,11 +175,73 @@ const EggCollection = () => {
         }
     };
 
+    // Componente Card Riutilizzabile per il layout "Totale SX | Dettagli DX"
+    const StatCard = ({ title, total, byColor, subtitle, isHistory = false }) => (
+        <div style={{
+            background: 'var(--color-bg-secondary)',
+            borderRadius: '12px',
+            border: '1px solid var(--border-color)',
+            display: 'flex',
+            overflow: 'hidden',
+            minHeight: '70px'
+        }}>
+            {/* SX: Totale */}
+            <div style={{
+                width: '70px',
+                background: isHistory ? 'var(--color-bg-primary)' : 'rgba(245, 158, 11, 0.1)',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                borderRight: '1px solid var(--border-color)',
+                padding: '8px'
+            }}>
+                <span style={{
+                    fontSize: '1.4rem',
+                    fontWeight: '800',
+                    color: isHistory ? 'var(--color-text-primary)' : '#F59E0B',
+                    lineHeight: 1
+                }}>
+                    {total}
+                </span>
+                <span style={{ fontSize: '0.6rem', textTransform: 'uppercase', opacity: 0.6, marginTop: '2px' }}>
+                    Uova
+                </span>
+            </div>
+
+            {/* DX: Dettagli */}
+            <div style={{ flex: 1, padding: '8px 12px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                    <span style={{ fontWeight: '600', fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                        {title}
+                    </span>
+                    {subtitle && <span style={{ fontSize: '0.75rem', opacity: 0.5 }}>{subtitle}</span>}
+                </div>
+
+                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                    {Object.entries(byColor).map(([color, qty]) => {
+                        if (!qty) return null;
+                        const meta = EGG_COLORS.find(c => c.id === color) || { hex: '#ccc', label: color };
+                        return (
+                            <div key={color} style={{ display: 'flex', alignItems: 'center', gap: '3px', fontSize: '0.8rem', opacity: 0.9 }}>
+                                <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: meta.hex, border: '1px solid rgba(0,0,0,0.1)' }}></div>
+                                <span>{qty}</span>
+                            </div>
+                        );
+                    })}
+                </div>
+            </div>
+        </div>
+    );
+
     return (
         <div className="egg-collection-page" style={{ padding: '2px 0', paddingBottom: '80px' }}>
             <Toaster position="top-center" />
 
-            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxWidth: '600px', margin: '0 auto' }}>
+            <form onSubmit={async (e) => {
+                await handleSubmit(e);
+                loadStats(); // Ricarica anche le stats dopo il submit
+            }} style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxWidth: '600px', margin: '0 auto' }}>
 
                 {/* HEADERS ROW: POLLAIO + DATA */}
                 <div style={{ display: 'flex', gap: '8px' }}>
@@ -273,63 +402,41 @@ const EggCollection = () => {
                 </button>
             </form>
 
-            {/* STORICO RECENTE */}
-            <div style={{ marginTop: '24px', padding: '0 8px' }}>
-                <h3 style={{ fontSize: '1rem', marginBottom: '12px', opacity: 0.8 }}>Ultime Raccolte</h3>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                    {history.map((record) => (
-                        <div key={record.id} style={{
-                            background: 'var(--color-bg-secondary)',
-                            borderRadius: '12px',
-                            padding: '12px',
-                            border: '1px solid var(--border-color)',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            gap: '8px'
-                        }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: '600' }}>
-                                    <MapPin size={14} className="text-secondary" />
-                                    <span>{record.coop_name}</span>
-                                </div>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem', opacity: 0.7 }}>
-                                    <Clock size={14} />
-                                    {/* Mostra Data e Ora */}
-                                    <span>
-                                        {new Date(record.recorded_at).toLocaleDateString()} {' '}
-                                        {new Date(record.recorded_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                    </span>
-                                </div>
-                            </div>
+            <div style={{ maxWidth: '600px', margin: '0 auto', marginTop: '24px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
 
-                            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                                {record.items.map((item, idx) => {
-                                    // Trova il colore per l'hex
-                                    const meta = EGG_COLORS.find(c => c.id === item.color) || { hex: '#ccc', label: item.color };
-                                    return (
-                                        <div key={idx} style={{
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            gap: '4px',
-                                            background: 'var(--color-bg-primary)',
-                                            padding: '4px 8px',
-                                            borderRadius: '8px',
-                                            fontSize: '0.85rem',
-                                            border: '1px solid var(--border-color)'
-                                        }}>
-                                            <div style={{ width: '10px', height: '14px', background: meta.hex, borderRadius: '50%' }}></div>
-                                            <strong>{item.quantity}</strong>
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                        </div>
-                    ))}
-                    {history.length === 0 && (
-                        <div style={{ textAlign: 'center', padding: '20px', opacity: 0.5, fontSize: '0.9rem' }}>
-                            Nessuna raccolta recente
-                        </div>
-                    )}
+                {/* SEZIONE RIEPILOGO STATISTICHE */}
+                <div style={{ padding: '0 8px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                    <h3 style={{ fontSize: '1rem', opacity: 0.8, margin: 0 }}>Statistiche</h3>
+                    <StatCard title="Oggi" total={statsData.today.total} byColor={statsData.today.byColor} />
+                    <StatCard title="Questa Settimana" total={statsData.week.total} byColor={statsData.week.byColor} />
+                    <StatCard title="Questo Mese" total={statsData.month.total} byColor={statsData.month.byColor} />
+                    <StatCard title="Quest'Anno" total={statsData.year.total} byColor={statsData.year.byColor} />
+                </div>
+
+                {/* SEZIONE STORICO */}
+                <div style={{ padding: '0 8px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                    <h3 style={{ fontSize: '1rem', opacity: 0.8, margin: 0 }}>Ultime Raccolte</h3>
+                    {history.map((record) => {
+                        // Prepara i dati per StatCard
+                        const byColor = record.items.reduce((acc, item) => {
+                            acc[item.color] = item.quantity;
+                            return acc;
+                        }, {});
+
+                        const timeStr = `${new Date(record.recorded_at).toLocaleDateString(undefined, { day: 'numeric', month: 'short' })} - ${new Date(record.recorded_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+
+                        return (
+                            <StatCard
+                                key={record.id}
+                                title={record.coop_name}
+                                subtitle={timeStr}
+                                total={record.total_quantity}
+                                byColor={byColor}
+                                isHistory={true}
+                            />
+                        );
+                    })}
+                    {history.length === 0 && <p style={{ textAlign: 'center', opacity: 0.5 }}>Nessuna raccolta recente</p>}
                 </div>
             </div>
         </div>
