@@ -14,7 +14,17 @@ const EGG_COLORS = [
 
 const EggCollection = () => {
     const navigate = useNavigate();
-    const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+
+    // FIX: Usa data locale, non UTC (che a 00:XX sballa di un giorno)
+    const getTodayLocal = () => {
+        const d = new Date();
+        const year = d.getFullYear();
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    };
+
+    const [date, setDate] = useState(getTodayLocal());
     const [counts, setCounts] = useState({
         'ROSA': '',
         'BIANCO': '',
