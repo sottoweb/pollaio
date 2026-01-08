@@ -466,11 +466,8 @@ const EggCollection = () => {
 
                 {/* SEZIONE RIEPILOGO STATISTICHE */}
                 <div style={{ padding: '0 8px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                    <h3 style={{ fontSize: '1rem', opacity: 0.8, margin: 0 }}>Statistiche</h3>
+                    <h3 style={{ fontSize: '1rem', opacity: 0.8, margin: 0 }}>Riepilogo Giornaliero</h3>
                     <StatCard title="Oggi" total={statsData.today.total} byColor={statsData.today.byColor} />
-                    <StatCard title="Questa Settimana" total={statsData.week.total} byColor={statsData.week.byColor} />
-                    <StatCard title="Questo Mese" total={statsData.month.total} byColor={statsData.month.byColor} />
-                    <StatCard title="Quest'Anno" total={statsData.year.total} byColor={statsData.year.byColor} />
                 </div>
 
                 {/* SEZIONE STORICO */}

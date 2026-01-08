@@ -7,6 +7,8 @@ import StatsCard from '../components/StatsCard';
 import Button from '../components/Button';
 import './Dashboard.css';
 
+import EggProductionWidget from '../components/EggProductionWidget';
+
 const Dashboard = () => {
     const navigate = useNavigate();
     const [transactions, setTransactions] = useState([]);
@@ -173,6 +175,11 @@ const Dashboard = () => {
                     onDelete={handleDelete}
                     isLoading={isLoading}
                 />
+            </div>
+
+            <div className="production-section" style={{ marginTop: '24px' }}>
+                <h3>Produzione Uova (Statistiche)</h3>
+                <EggProductionWidget />
             </div>
         </div>
     );
