@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { SpeedInsights } from "@vercel/speed-insights/react";
 import Layout from './components/Layout';
 
 // Auth Pages
@@ -57,6 +58,7 @@ function App() {
           <Route path="/breed/:id" element={<ProtectedRoute><BreedDetails /></ProtectedRoute>} />
           <Route path="/profile" element={<ProtectedRoute><UserProfile /></ProtectedRoute>} />
         </Routes>
+        <SpeedInsights />
       </AuthProvider>
     </Router>
   );
